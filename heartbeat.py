@@ -13,7 +13,7 @@ def go():
     tf = 86400
     for pair in alpha["pairs"]:
          df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf))
-         setup(df, tf, pair['pair'])
+         strategy.setup(df, tf, pair['pair'])
 go()
 
 
