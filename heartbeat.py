@@ -1,4 +1,4 @@
-import api.ftx a f
+import api.ftx as f
 import cfg_load
 alpha = cfg_load.load('/home/ubuntu/eye3/alpha.yaml')
 
