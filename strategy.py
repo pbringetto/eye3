@@ -9,8 +9,6 @@ pd.set_option('display.max_columns', 1000)
 pd.set_option('display.width', 1000)
 
 class Strategy:
-    def __init__(self):
-
     def bottom_idx(self, df, key, order):
         return argrelextrema(df[key].values, np.less_equal, order=order)[0]
 
