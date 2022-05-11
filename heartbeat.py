@@ -2,7 +2,7 @@ import api.ftx as f
 import cfg_load
 alpha = cfg_load.load('/home/ubuntu/eye3/alpha.yaml')
 
-def go()
+def go():
     ftx = f.FtxClient(alpha["key"], alpha["secret"])
 
     for pair in alpha["pairs"]:
