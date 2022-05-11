@@ -1,7 +1,7 @@
 import api.ftx as f
 import strategy as s
 import cfg_load
-alpha = cfg_load.load('/home/ubuntu/eye3/alpha.yaml')
+alpha = cfg_load.load('alpha.yaml')
 import pandas as pd
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.max_columns', 1000)

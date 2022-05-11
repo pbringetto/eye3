@@ -3,12 +3,24 @@ import pandas_ta as ta
 import numpy as np
 import cfg_load
 import helpers.util as u
-alpha = cfg_load.load('/home/ubuntu/eye3/alpha.yaml')
+from scipy.stats import linregress
+from scipy.signal import argrelextrema
+import math
+
+alpha = cfg_load.load('alpha.yaml')
 pd.set_option('display.max_rows', 2000)
 pd.set_option('display.max_columns', 1000)
 pd.set_option('display.width', 1000)
+pd.options.mode.chained_assignment = None
 
 class Strategy:
+    def setup(self, ohlc, tf, pair):
+        price = float(ohlc['close'][::-1][0])
+        ohlc = self.rsi(ohlc)
+
+        self.divergence(ohlc, tf)
+        u.show_object('strategy data', ohlc.iloc[-1])
+
     def bottom_idx(self, df, key, order):
         return argrelextrema(df[key].values, np.less_equal, order=order)[0]
 
@@ -16,13 +28,13 @@ class Strategy:
         return argrelextrema(df[key].values, np.greater_equal, order=order)[0]
 
     def peak_slope(self, df, tf, key):
-        bottom_idx = self.bottom_idx(df, key, tf['extrema_order'])
-        top_idx = self.top_idx(df, key, tf['extrema_order'])
+        bottom_idx = self.bottom_idx(df, key, 13)
+        top_idx = self.top_idx(df, key, 13)
         b = df.iloc[bottom_idx].copy()
         t = df.iloc[top_idx].copy()
 
-        b[f'{key}_lows_slope'] = b[key].rolling(window=tf["extrema_peaks"]).apply(self.get_slope, raw=True)
-        t[f'{key}_high_slope'] = t[key].rolling(window=tf["extrema_peaks"]).apply(self.get_slope, raw=True)
+        b[f'{key}_lows_slope'] = b[key].rolling(window=2).apply(self.get_slope, raw=True)
+        t[f'{key}_high_slope'] = t[key].rolling(window=2).apply(self.get_slope, raw=True)
 
         return b[f'{key}_lows_slope'].iloc[-1], t[f'{key}_high_slope'].iloc[-1]
 
@@ -50,13 +62,6 @@ class Strategy:
         u.show('bearish_hidden', bearish_hidden)
         u.show('bullish_exaggerated', bearish_regular)
         u.show('bearish_exaggerated', bearish_hidden)
-
-    def setup(self, ohlc, tf, pair):
-        price = float(ohlc['close'][::-1][0])
-        ohlc = self.rsi(ohlc)
-
-        self.divergence(ohlc, tf)
-        u.show_object('strategy data', ohlc.iloc[-1])
 
     def get_slope(self, array):
         y = np.array(array)
