@@ -6,6 +6,7 @@ import helpers.util as u
 from scipy.stats import linregress
 from scipy.signal import argrelextrema
 import math
+import matplotlib.pyplot as plt
 
 alpha = cfg_load.load('alpha.yaml')
 pd.set_option('display.max_rows', 2000)
@@ -17,9 +18,30 @@ class Strategy:
     def setup(self, ohlc, tf, pair):
         price = float(ohlc['close'][::-1][0])
         ohlc = self.rsi(ohlc)
+        div_data, df = self.divergence(ohlc, tf)
+        macd_data, df = self.macd_slope(ohlc, tf)
 
-        self.divergence(ohlc, tf)
-        u.show_object('strategy data', ohlc.iloc[-1])
+        #print(df.iloc[-1])
+
+        data = div_data | macd_data
+
+
+
+        return data, df
+
+    def macd_slope(self, ohlc, time_frame):
+        ohlc.ta.macd(close='close', fast=12, slow=26, signal=9, append=True)
+        ohlc['macd_slope'] = ohlc['MACD_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
+        ohlc['macd_sig_slope'] = ohlc['MACDs_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
+        ohlc['macd_hist_slope'] = ohlc['MACDh_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
+
+        data = {
+            'macd_rising': 'MACD is rising' if ohlc['macd_slope'].iloc[-1] >= 8 else False,
+            'macd_dropping': 'MACD is dropping' if ohlc['macd_slope'].iloc[-1] <= 8 else False,
+            #'macd_slope': ohlc['macd_slope'].iloc[-1],
+        }
+
+        return data, ohlc
 
     def bottom_idx(self, df, key, order):
         return argrelextrema(df[key].values, np.less_equal, order=order)[0]
@@ -28,40 +50,47 @@ class Strategy:
         return argrelextrema(df[key].values, np.greater_equal, order=order)[0]
 
     def peak_slope(self, df, tf, key):
-        bottom_idx = self.bottom_idx(df, key, 13)
-        top_idx = self.top_idx(df, key, 13)
+        bottom_idx = self.bottom_idx(df, key, 21)
+        top_idx = self.top_idx(df, key, 21)
         b = df.iloc[bottom_idx].copy()
         t = df.iloc[top_idx].copy()
 
-        b[f'{key}_lows_slope'] = b[key].rolling(window=2).apply(self.get_slope, raw=True)
-        t[f'{key}_high_slope'] = t[key].rolling(window=2).apply(self.get_slope, raw=True)
+        df[f'{key}_low'] = False
+        df[f'{key}_low'].loc[bottom_idx] = True
+        df[f'{key}_high'] = False
+        df[f'{key}_high'].loc[top_idx] = True
 
-        return b[f'{key}_lows_slope'].iloc[-1], t[f'{key}_high_slope'].iloc[-1]
+        b[f'{key}_lows_slope'] = b[key].rolling(window=2).apply(self.get_slope, raw=True)
+        t[f'{key}_highs_slope'] = t[key].rolling(window=2).apply(self.get_slope, raw=True)
+
+        return b[f'{key}_lows_slope'].iloc[-1], t[f'{key}_highs_slope'].iloc[-1], df
+
+    def peaks(self, df, tf):
+        close_bottom_slope, close_top_slope, df = self.peak_slope(df, tf, 'close')
+        rsi_bottom_slope, rsi_top_slope, df = self.peak_slope(df, tf, 'rsi')
+        df.merge(df)
+        return close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df
 
     def divergence(self, df, tf):
-        close_bottom_slope, close_top_slope = self.peak_slope(df, tf, 'close')
-        rsi_bottom_slope, rsi_top_slope = self.peak_slope(df, tf, 'rsi')
-
-        print('divergence------------------------')
-        u.show('close_bottom_slope', close_bottom_slope)
-        u.show('close_top_slope', close_top_slope)
-        u.show('rsi_bottom_slope', rsi_bottom_slope)
-        u.show('rsi_top_slope', rsi_top_slope)
+        close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df = self.peaks(df, tf)
 
         bullish_regular = (close_bottom_slope < 0) and (rsi_bottom_slope > 0)
         bullish_hidden = (rsi_top_slope < 0) and (close_bottom_slope > 0)
-        bullish_exaggerated = (math.isclose(0, close_bottom_slope) and rsi_bottom_slope > 0) or (math.isclose(0, rsi_bottom_slope) and close_bottom_slope < 0)
-
         bearish_regular = (close_top_slope > 0) and (rsi_top_slope < 0)
         bearish_hidden = (close_top_slope < 0) and (rsi_top_slope > 0)
-        bearish_exaggerated = (math.isclose(0, close_top_slope) and rsi_top_slope < 0) or (math.isclose(0, rsi_top_slope) and close_top_slope > 0)
 
-        u.show('bullish_regular', bullish_regular)
-        u.show('bullish_hidden', bullish_hidden)
-        u.show('bearish_regular', bearish_regular)
-        u.show('bearish_hidden', bearish_hidden)
-        u.show('bullish_exaggerated', bearish_regular)
-        u.show('bearish_exaggerated', bearish_hidden)
+        data = {
+             #'close_bottom_slope': close_bottom_slope,
+             #'close_top_slope': close_top_slope,
+             #'rsi_bottom_slope': rsi_bottom_slope,
+             #'rsi_top_slope': rsi_top_slope,
+             'bullish_regular': 'Bullish divergence' if bullish_regular else False,
+             'bullish_hidden': 'Hidden Bullish divergence' if bullish_hidden else False,
+             'bearish_regular': 'Bearish divergence' if bearish_regular else False,
+             'bearish_hidden': 'Hidden Bearish divergence' if bearish_hidden else False,
+        }
+
+        return data, df
 
     def get_slope(self, array):
         y = np.array(array)

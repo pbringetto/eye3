@@ -15,7 +15,6 @@ class FtxClient:
         self._api_secret = api_secret
 
     def _get(self, path: str, params: Optional[Dict[str, Any]] = None) -> Any:
-        print(path)
         return self._request('GET', path, params=params)
 
     def _post(self, path: str, params: Optional[Dict[str, Any]] = None) -> Any:
