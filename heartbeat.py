@@ -17,33 +17,45 @@ def signal_keys():
 def signals(data, pair, tf):
     buy_signal_keys, sell_signal_keys = signal_keys()
     buy_signals, sell_signals = [], []
-
     signals = signal_data.get_signals(pair, tf)
     if signals:
-        previous_signals = list(filter(lambda x: x['created_at'] == signals[0]['created_at'], signals))
-        previous_signals_dict = {}
-        for value in previous_signals:
-            previous_signals_dict[value['key']] = value['value']
-        current_signals = {}
         for key, value in data.items():
-            if value:
-                current_signals[key] = value
-        shared_items = {k: previous_signals_dict[k] for k in previous_signals_dict if k in current_signals and previous_signals_dict[k] == current_signals[k]}
 
-        for key, value in data.items():
+
             if value:
                 if key in buy_signal_keys:
                     buy_signals.append({key : value})
                 if key in sell_signal_keys:
                     sell_signals.append({key : value})
-                print(len(previous_signals_dict))
-                print(len(shared_items))
-                if len(previous_signals_dict) != len(shared_items):
+
+                if structure_change(signals, data):
                     signal_data.insert_signal(pair, tf, key, value)
-                    print('update')
+                    twitter.tweet()
                 else:
                     print('no change')
+
+
+
+    else:
+        for key, value in data.items():
+            if value:
+                signal_data.insert_signal(pair, tf, key, value)
+                print('update')
+
     return buy_signals, sell_signals
+
+
+def structure_change(signals, data):
+    previous_signals = list(filter(lambda x: x['created_at'] == signals[0]['created_at'], signals))
+    previous_signals_dict = {}
+    for value in previous_signals:
+        previous_signals_dict[value['key']] = value['value']
+    current_signals = {}
+    for key, value in data.items():
+        if value:
+            current_signals[key] = value
+    shared_items = {k: previous_signals_dict[k] for k in previous_signals_dict if k in current_signals and previous_signals_dict[k] == current_signals[k]}
+    return len(previous_signals_dict) != len(shared_items)
 
 def go():
     strategy = s.Strategy()
