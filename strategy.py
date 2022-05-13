@@ -17,16 +17,18 @@ pd.options.mode.chained_assignment = None
 class Strategy:
     def setup(self, ohlc, tf, pair):
         price = float(ohlc['close'][::-1][0])
-        ohlc = self.rsi(ohlc)
-        div_data, df = self.divergence(ohlc, tf)
-        macd_data, df = self.macd_slope(ohlc, tf)
+        rsi_data, ohlc = self.rsi(ohlc, tf)
+        macd_data, ohlc = self.macd_slope(ohlc, tf)
+        div_data, ohlc = self.divergence(ohlc, tf)
+        data = div_data | macd_data | rsi_data
+        return data, ohlc
 
-        #print(df.iloc[-1])
-
-        data = div_data | macd_data
-
-
-
+    def rsi(self, df, time_frame):
+        df = self.get_rsi(df)
+        data = {
+            'rsi_oversold': 'RSI is Oversold' if df['rsi'].iloc[-1] <= 30 else False,
+            'rsi_overbought': 'RSI is Overbought' if df['rsi'].iloc[-1] >= 70 else False
+        }
         return data, df
 
     def macd_slope(self, ohlc, time_frame):
@@ -38,9 +40,13 @@ class Strategy:
         data = {
             'macd_rising': 'MACD is rising' if ohlc['macd_slope'].iloc[-1] >= 8 else False,
             'macd_dropping': 'MACD is dropping' if ohlc['macd_slope'].iloc[-1] <= 8 else False,
-            #'macd_slope': ohlc['macd_slope'].iloc[-1],
+            'cross_soon' : 'MACD Crossover soon' if math.isclose(ohlc['MACD_12_26_9'].iloc[-1], ohlc['MACDs_12_26_9'].iloc[-1], abs_tol=100) else False,
+            'macd_over_signal': 'MACD over Signal' if ohlc['MACD_12_26_9'].iloc[-1] > ohlc['MACDs_12_26_9'].iloc[-1] else False,
+            'macd_over_centerline': 'MACD over centerline' if ohlc['MACD_12_26_9'].iloc[-1] > 0 else False,
+            'macd_under_signal': 'MACD under Signal' if ohlc['MACD_12_26_9'].iloc[-1] < ohlc['MACDs_12_26_9'].iloc[-1] else False,
+            'macd_under_centerline': 'MACD under centerline' if ohlc['MACD_12_26_9'].iloc[-1] < 0 else False,
+            'macd_signal_crossing_soon' : 'MACD crossover signal soon' if math.isclose(ohlc['MACD_12_26_9'].iloc[-1], ohlc['MACDs_12_26_9'].iloc[-1], abs_tol=100) else False,
         }
-
         return data, ohlc
 
     def bottom_idx(self, df, key, order):
@@ -54,15 +60,12 @@ class Strategy:
         top_idx = self.top_idx(df, key, 21)
         b = df.iloc[bottom_idx].copy()
         t = df.iloc[top_idx].copy()
-
         df[f'{key}_low'] = False
         df[f'{key}_low'].loc[bottom_idx] = True
         df[f'{key}_high'] = False
         df[f'{key}_high'].loc[top_idx] = True
-
-        b[f'{key}_lows_slope'] = b[key].rolling(window=2).apply(self.get_slope, raw=True)
-        t[f'{key}_highs_slope'] = t[key].rolling(window=2).apply(self.get_slope, raw=True)
-
+        b[f'{key}_lows_slope'] = b[key].rolling(window=4).apply(self.get_slope, raw=True)
+        t[f'{key}_highs_slope'] = t[key].rolling(window=4).apply(self.get_slope, raw=True)
         return b[f'{key}_lows_slope'].iloc[-1], t[f'{key}_highs_slope'].iloc[-1], df
 
     def peaks(self, df, tf):
@@ -71,14 +74,12 @@ class Strategy:
         df.merge(df)
         return close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df
 
-    def divergence(self, df, tf):
-        close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df = self.peaks(df, tf)
-
+    def divergence(self, ohlc, tf):
+        close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df = self.peaks(ohlc, tf)
         bullish_regular = (close_bottom_slope < 0) and (rsi_bottom_slope > 0)
         bullish_hidden = (rsi_top_slope < 0) and (close_bottom_slope > 0)
         bearish_regular = (close_top_slope > 0) and (rsi_top_slope < 0)
         bearish_hidden = (close_top_slope < 0) and (rsi_top_slope > 0)
-
         data = {
              #'close_bottom_slope': close_bottom_slope,
              #'close_top_slope': close_top_slope,
@@ -89,8 +90,7 @@ class Strategy:
              'bearish_regular': 'Bearish divergence' if bearish_regular else False,
              'bearish_hidden': 'Hidden Bearish divergence' if bearish_hidden else False,
         }
-
-        return data, df
+        return data, ohlc
 
     def get_slope(self, array):
         y = np.array(array)
@@ -98,7 +98,7 @@ class Strategy:
         slope, intercept, r_value, p_value, std_err = linregress(x,y)
         return slope
 
-    def rsi(self, df):
+    def get_rsi(self, df):
         window_length = 14
         df['diff'] = df['close'].diff(1)
         df['gain'] = df['diff'].clip(lower=0).round(2)
