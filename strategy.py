@@ -17,11 +17,83 @@ pd.options.mode.chained_assignment = None
 class Strategy:
     def setup(self, ohlc, tf, pair):
         price = float(ohlc['close'][::-1][0])
+
+
+        ma_data, ohlc = self.ma(ohlc, tf)
+        ema_data, ohlc = self.ema(ohlc, tf)
+        bollinger_data, ohlc = self.bollinger(ohlc, tf)
+
         rsi_data, ohlc = self.rsi(ohlc, tf)
         macd_data, ohlc = self.macd_slope(ohlc, tf)
         div_data, ohlc = self.divergence(ohlc, tf)
-        data = div_data | macd_data | rsi_data
+
+
+        print(ohlc.iloc[-1])
+
+
+        data = div_data | macd_data | rsi_data | ma_data | ema_data | bollinger_data
+
+
+
+
         return data, ohlc
+
+    def bollinger(self, df, time_frame):
+
+        tp = (df['close'] + df['low'] + df['high'])/3
+        df['std'] = tp.rolling(20).std(ddof=0)
+        matp = tp.rolling(20).mean()
+        df['bollinger_high'] = matp + 2*df['std']
+        df['bollinger_low'] = matp - 2*df['std']
+
+        data = {
+            'below_bollinger_low': 'Below bollinger Low' if df['close'].iloc[-1] < df['bollinger_low'].iloc[-1] else False,
+            'above_bollinger_high': 'Above bollinger high' if df['close'].iloc[-1] > df['bollinger_high'].iloc[-1] else False,
+            'at_bollinger_low' : 'At Bollinger low' if math.isclose(df['close'].iloc[-1], df['bollinger_low'].iloc[-1], abs_tol=100) else False,
+            'at_bollinger_high' : 'At Bollinger high' if math.isclose(df['close'].iloc[-1], df['bollinger_high'].iloc[-1], abs_tol=100) else False,
+        }
+
+        return data, df
+
+
+    def ma(self, df, time_frame):
+        df['ma20'] = df['close'].rolling(20).mean()
+        df['ma50'] = df['close'].rolling(50).mean()
+        df['ma100'] = df['close'].rolling(100).mean()
+        df['ma200'] = df['close'].rolling(200).mean()
+
+
+        data = {
+            'above_ma_20': 'Above 20 period moving average' if df['close'].iloc[-1] > df['ma20'].iloc[-1] else False,
+            'above_ma_50': 'Above 50 period moving average' if df['close'].iloc[-1] > df['ma50'].iloc[-1] else False,
+            'above_ma_100': 'Above 100 period moving average' if df['close'].iloc[-1] > df['ma100'].iloc[-1] else False,
+            'above_ma_200': 'Above 200 period moving average' if df['close'].iloc[-1] > df['ma200'].iloc[-1] else False,
+            'below_ma_20': 'Below 20 period moving average' if df['close'].iloc[-1] > df['ma20'].iloc[-1] else False,
+            'below_ma_50': 'Below 50 period moving average' if df['close'].iloc[-1] > df['ma50'].iloc[-1] else False,
+            'below_ma_100': 'Below 100 period moving average' if df['close'].iloc[-1] > df['ma100'].iloc[-1] else False,
+            'below_ma_200': 'Below 200 period moving average' if df['close'].iloc[-1] > df['ma200'].iloc[-1] else False,
+        }
+        return data, df
+
+
+    def ema(self, df, time_frame):
+
+        df['ema20'] = df['close'].ewm(span=20, adjust=False).mean()
+        df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
+        df['ema100'] = df['close'].ewm(span=100, adjust=False).mean()
+        df['ema200'] = df['close'].ewm(span=200, adjust=False).mean()
+
+        data = {
+            'above_ema_20': 'Above 20 period moving average' if df['close'].iloc[-1] > df['ema20'].iloc[-1] else False,
+            'above_ema_50': 'Above 50 period moving average' if df['close'].iloc[-1] > df['ema50'].iloc[-1] else False,
+            'above_ema_100': 'Above 100 period moving average' if df['close'].iloc[-1] > df['ema100'].iloc[-1] else False,
+            'above_ema_200': 'Above 200 period moving average' if df['close'].iloc[-1] > df['ema200'].iloc[-1] else False,
+            'below_ema_20': 'Below 20 period moving average' if df['close'].iloc[-1] > df['ema20'].iloc[-1] else False,
+            'below_ema_50': 'Below 50 period moving average' if df['close'].iloc[-1] > df['ema50'].iloc[-1] else False,
+            'below_ema_100': 'Below 100 period moving average' if df['close'].iloc[-1] > df['ema100'].iloc[-1] else False,
+            'below_ema_200': 'Below 200 period moving average' if df['close'].iloc[-1] > df['ema200'].iloc[-1] else False,
+        }
+        return data, df
 
     def rsi(self, df, time_frame):
         df = self.get_rsi(df)

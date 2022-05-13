@@ -12,38 +12,35 @@ import models.signal_model as sig
 signal_data = sig.SignalDataModel()
 
 def signal_keys():
-   return ['rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_over_signal', 'macd_over_centerline', 'macd_rising'], ['rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_under_signal', 'macd_under_centerline', 'macd_dropping']
+   return ['at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_over_signal', 'macd_over_centerline', 'macd_rising'], ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_under_signal', 'macd_under_centerline', 'macd_dropping']
 
-def signals(data, pair, tf):
-    buy_signal_keys, sell_signal_keys = signal_keys()
-    buy_signals, sell_signals = [], []
+def get_signals(pair, tf, data):
     signals = signal_data.get_signals(pair, tf)
-    if signals:
-        for key, value in data.items():
-
-
-            if value:
-                if key in buy_signal_keys:
-                    buy_signals.append({key : value})
-                if key in sell_signal_keys:
-                    sell_signals.append({key : value})
-
-                if structure_change(signals, data):
-                    signal_data.insert_signal(pair, tf, key, value)
-                    twitter.tweet()
-                else:
-                    print('no change')
-
-
-
-    else:
+    if not signals:
         for key, value in data.items():
             if value:
                 signal_data.insert_signal(pair, tf, key, value)
-                print('update')
+                signals = signal_data.get_signals(pair, tf)
+    return signals
 
-    return buy_signals, sell_signals
+def split_signals(signals, data, pair, tf):
+    buy_signal_keys, sell_signal_keys = signal_keys()
+    buy_signals, sell_signals = [], []
+    update = False
+    for key, value in data.items():
+        if value:
+            if key in buy_signal_keys:
+                buy_signals.append({key : value})
+            if key in sell_signal_keys:
+                sell_signals.append({key : value})
+            if structure_change(signals, data):
+                signal_data.insert_signal(pair, tf, key, value)
+                update = True
+    return buy_signals, sell_signals, update
 
+def signals(data, pair, tf):
+    signals = get_signals(pair, tf, data)
+    return split_signals(signals, data, pair, tf)
 
 def structure_change(signals, data):
     previous_signals = list(filter(lambda x: x['created_at'] == signals[0]['created_at'], signals))
@@ -59,63 +56,38 @@ def structure_change(signals, data):
 
 def go():
     strategy = s.Strategy()
-    twitter = t.Twitter()
+
     ftx = f.FtxClient(alpha["ftx_key"], alpha["ftx_secret"])
     tf = 86400
     for pair in alpha["pairs"]:
         for tf in alpha["timeframes"]:
-             df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf['seconds']))
-             data, df = strategy.setup(df, tf['seconds'], pair['pair'])
+            df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf['seconds']))
+            data, df = strategy.setup(df, tf['seconds'], pair['pair'])
+            buy_signals, sell_signals, update = signals(data, pair['pair'], tf['seconds'])
 
-             u.show('Market', pair['label'])
-             u.show('Timeframe', tf['label'])
-             u.show('Price', df['close'].iloc[-1])
-             u.show('Open Price', df['open'].iloc[-1])
-             u.show('High', df['high'].iloc[-1])
-             u.show('Low', df['low'].iloc[-1])
+            if update:
+                tweet(buy_signals, sell_signals)
 
-             buy_signals, sell_signals = signals(data, pair['pair'], tf['seconds'])
+            u.show('Market', pair['label'])
+            u.show('Timeframe', tf['label'])
+            u.show('Price', df['close'].iloc[-1])
+            u.show('Open Price', df['open'].iloc[-1])
+            u.show('High', df['high'].iloc[-1])
+            u.show('Low', df['low'].iloc[-1])
 
-             print('bullish case------------------------------------')
-             for value in buy_signals:
-                 print(value)
+            print('bullish case------------------------------------')
+            for value in buy_signals:
+                print(value)
 
-             print('bearish case------------------------------------')
-             for value in sell_signals:
-                 print(value)
-
-
-
-             '''
-             #get signal table row for tf pair since n
-             if data['rsi_oversold']:
-                 #if tf pair signal table row not exist since n
-                 #create signal table row
-
-             if data['rsi_oversold']:
-
-             rsi oversold
-             bullish divergence
-             macd crosses
-             buy
-
-             if data['bullish_regular'] or data['bullish_regular']:
-                 #if tf pair signal table row exist since n
-                 #update signal table row
-
-             if data['bullish_regular'] or data['bullish_regular']:
+            print('bearish case------------------------------------')
+            for value in sell_signals:
+                print(value)
 
 
-            'macd_over_signal': 'MACD Crossover soon' if ohlc['MACD_12_26_9'].iloc[-1] > ohlc['MACDs_12_26_9'].iloc[-1] else False,
-            'macd_over_centerline':
 
-             rsi overbought
-             bearish divergence
-             macd crosses
-             sell
-             '''
-
-             twitter.tweet()
+def tweet(buy_signals, sell_signals):
+    twitter = t.Twitter()
+    twitter.tweet('hello')
 
 go()
 

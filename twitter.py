@@ -15,6 +15,6 @@ class Twitter:
             )
         self.api = tweepy.API(self.auth)
 
-    def tweet(self):
-        tweet = "hello"
+    def tweet(self, data):
+        tweet = data
         #status = self.api.update_status(status=tweet)
