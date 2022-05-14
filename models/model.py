@@ -27,7 +27,7 @@ class Model:
         self.connection.close()
         return None if len(results) == 0 else results[0]
 
-    def select_all(self, sql, params):
+    def select_all(self, sql, params = None):
         self.connection = mysql.connector.connect(**self.db_config)
         cursor = self.connection.cursor()
         cursor.execute(sql, params)

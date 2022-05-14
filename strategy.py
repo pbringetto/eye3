@@ -27,14 +27,7 @@ class Strategy:
         macd_data, ohlc = self.macd_slope(ohlc, tf)
         div_data, ohlc = self.divergence(ohlc, tf)
 
-
-        print(ohlc.iloc[-1])
-
-
         data = div_data | macd_data | rsi_data | ma_data | ema_data | bollinger_data
-
-
-
 
         return data, ohlc
 
