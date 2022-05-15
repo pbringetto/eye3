@@ -1,39 +1,14 @@
-#import pandas as pd
-#import pandas_ta as ta
-#import numpy as np
-#import cfg_load
+#import typing
+import pandas as pd
+import pandas_ta as ta
+import numpy as np
+import cfg_load
 #import helpers.util as u
-#from scipy.stats import linregress
-#from scipy.signal import argrelextrema
-#import math
+from scipy.stats import linregress
+from scipy.signal import argrelextrema
+import math
 
-#alpha = cfg_load.load('alpha.yaml')
-#pd.set_option('display.max_rows', 2000)
-#pd.set_option('display.max_columns', 1000)
-#pd.set_option('display.width', 1000)
-#pd.options.mode.chained_assignment = None
-
-import packages.indicator as i
-
-class Strategy:
-    def __init__(self):
-        self.indicator = i.Indicator()
-
-    def setup(self, ohlc, tf, pair):
-        price = float(ohlc['close'][::-1][0])
-
-        ma_data, ohlc = indicator.ma(ohlc, tf)
-        ema_data, ohlc = indicator.ema(ohlc, tf)
-        bollinger_data, ohlc = indicator.bollinger(ohlc, tf)
-
-        rsi_data, ohlc = indicator.rsi(ohlc, tf)
-        macd_data, ohlc = indicator.macd_slope(ohlc, tf)
-        div_data, ohlc = indicator.divergence(ohlc, tf)
-
-        data = {**div_data, **macd_data, **rsi_data, **ma_data, **ema_data, **bollinger_data}
-
-        return data, ohlc
-    '''
+class Indicator:
     def bollinger(self, df, time_frame):
 
         tp = (df['close'] + df['low'] + df['high'])/3
@@ -181,4 +156,3 @@ class Strategy:
         df['rsi'] = 100 - (100 / (1.0 + df['rs']))
         df.drop(['diff', 'gain', 'loss', 'avg_gain', 'avg_gain', 'rs'], axis=1, inplace=True)
         return df
-    '''

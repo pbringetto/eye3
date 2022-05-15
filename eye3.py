@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.route("/")
 def hello():
     drop = d.Drop()
-    data = drop.signals()
+    data = drop.alpha()
     #print(buy_signals)
     #return render_template('index.html', buy_signals=buy_signals, sell_signals=sell_signals )
     return 'fhjgfjgjh'
