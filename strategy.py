@@ -6,7 +6,7 @@ import helpers.util as u
 from scipy.stats import linregress
 from scipy.signal import argrelextrema
 import math
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 alpha = cfg_load.load('alpha.yaml')
 pd.set_option('display.max_rows', 2000)

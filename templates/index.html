@@ -1,0 +1,13 @@
+<h1>Bulliah Case</h1>
+{% for item in buy_signals %}
+    {% for key, value in item.items() %}
+        <h3>{{value}}</h3>
+    {% endfor %}
+{% endfor %}
+
+<h1>Bearish Case</h1>
+{% for item in sell_signals %}
+    {% for key, value in item.items() %}
+        <h3>{{value}}</h3>
+    {% endfor %}
+{% endfor %}
