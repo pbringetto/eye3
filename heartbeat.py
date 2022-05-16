@@ -10,8 +10,9 @@ pd.set_option('display.max_columns', 1000)
 pd.set_option('display.width', 1000)
 import models.signal_model as sm
 signal_data = sm.SignalDataModel()
-    def signal_keys(self):
-       return ['at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_over_signal', 'macd_over_centerline', 'macd_rising'], ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_under_signal', 'macd_under_centerline', 'macd_dropping']
+
+def signal_keys():
+   return ['at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_over_signal', 'macd_over_centerline', 'macd_rising'], ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_under_signal', 'macd_under_centerline', 'macd_dropping']
 
 def get_signals(pair, tf, data, df):
     signals = signal_data.get_signals(pair, tf)
@@ -23,7 +24,7 @@ def get_signals(pair, tf, data, df):
     return signals
 
 def split_signals(signals, data, pair, tf, df):
-    buy_signal_keys, sell_signal_keys = self.signal_keys()
+    buy_signal_keys, sell_signal_keys = signal_keys()
     buy_signals, sell_signals = [], []
     update = False
     for key, value in data.items():

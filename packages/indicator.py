@@ -1,12 +1,11 @@
-#import typing
 import pandas as pd
 import pandas_ta as ta
 import numpy as np
 import cfg_load
-#import helpers.util as u
 from scipy.stats import linregress
 from scipy.signal import argrelextrema
 import math
+pd.options.mode.chained_assignment = None
 
 class Indicator:
     def bollinger(self, df, time_frame):

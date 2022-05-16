@@ -7,9 +7,7 @@ app = Flask(__name__)
 def hello():
     drop = d.Drop()
     data = drop.alpha()
-    #print(buy_signals)
-    #return render_template('index.html', buy_signals=buy_signals, sell_signals=sell_signals )
-    return 'fhjgfjgjh'
+    return render_template('index.html', data=data)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

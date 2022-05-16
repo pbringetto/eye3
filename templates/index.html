@@ -1,13 +1,21 @@
-<h1>Bulliah Case</h1>
-{% for item in buy_signals %}
-    {% for key, value in item.items() %}
-        <h3>{{value}}</h3>
-    {% endfor %}
-{% endfor %}
-
-<h1>Bearish Case</h1>
-{% for item in sell_signals %}
-    {% for key, value in item.items() %}
-        <h3>{{value}}</h3>
+{% for pk,pv  in data.items() %}
+    <h1>{{pk}}</h1>
+    {% for tk,tv  in pv.items() %}
+        <h2>{{tk}}</h2>
+        {% for sk, sv  in tv.items() %}
+            <div>
+                <h4>{{sk}}</h4>
+                {% for ck, cv  in sv.items() %}
+                <div>
+                    <h5>{{ck}}</h5>
+                    {% for item in cv %}
+                    <div>
+                        {{item.value}}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
     {% endfor %}
 {% endfor %}

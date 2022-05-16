@@ -11,6 +11,13 @@ class SignalDataModel:
         params = (timeframe, pair, )
         return self.model.select_all(sql, params)
 
+    def get_signal(self, pair, timeframe, key):
+        sql = """ SELECT * FROM `signal`
+                  WHERE timeframe = %s AND pair = %s AND `key` = %s
+                  ORDER BY id DESC LIMIT 1 """
+        params = (timeframe, pair, key, )
+        return self.model.select_one(sql, params)
+
     def insert_signal(self, pair, timeframe, key, value, ohlc_timestamp):
         sql = "INSERT IGNORE INTO `signal` (pair, timeframe, `key`, `value`, ohlc_timestamp) VALUES (%s, %s, %s, %s, %s)"
         params = (pair, timeframe, key, value, ohlc_timestamp, )
