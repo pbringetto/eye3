@@ -11,6 +11,12 @@ class SignalDataModel:
         params = (timeframe, pair, )
         return self.model.select_all(sql, params)
 
+    def get_all_signals(self, limit):
+        sql = """ SELECT * FROM `signal`
+                  ORDER BY id DESC LIMIT %s """
+        params = (limit, )
+        return self.model.select_all(sql, params)
+
     def get_signal(self, pair, timeframe, key):
         sql = """ SELECT * FROM `signal`
                   WHERE timeframe = %s AND pair = %s AND `key` = %s

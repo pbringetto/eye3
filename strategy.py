@@ -5,6 +5,7 @@ class Strategy:
         self.indicator = i.Indicator()
 
     def setup(self, ohlc, tf, pair):
+
         price = float(ohlc['close'][::-1][0])
 
         ma_data, ohlc = self.indicator.ma(ohlc, tf)

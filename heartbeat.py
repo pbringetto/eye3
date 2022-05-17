@@ -16,26 +16,40 @@ def signal_keys():
 
 def get_signals(pair, tf, data, df):
     signals = signal_data.get_signals(pair, tf)
-    if not signals:
-        for key, value in data.items():
-            if value:
-                signal_data.insert_signal(pair, tf, key, value, df['startTime'].iloc[-1])
-                signals = signal_data.get_signals(pair, tf)
+    #print('get_signals from db')
+    #print(signals)
+    #active_signals = []
+    #if not signals:
+        #print('no signals')
+        #for key, value in data.items():
+            #if value:
+                #active_signals.append({key : value})
+                #signal_data.insert_signal(pair, tf, key, value, df['startTime'].iloc[-1])
+                #signals = signal_data.get_signals(pair, tf)
+        #print('first insert')
+        #print(active_signals)
     return signals
 
 def split_signals(signals, data, pair, tf, df):
     buy_signal_keys, sell_signal_keys = signal_keys()
     buy_signals, sell_signals = [], []
     update = False
+    active_signals = []
     for key, value in data.items():
         if value:
+            active_signals.append({key : value})
             if key in buy_signal_keys:
                 buy_signals.append({key : value})
             if key in sell_signal_keys:
                 sell_signals.append({key : value})
-            if structure_change(signals, data):
-                signal_data.insert_signal(pair, tf, key, value, df['startTime'].iloc[-1])
-                update = True
+
+    #print('other insert')
+    #print(active_signals)
+
+    if structure_change(signals, data):
+        update = True
+        #print(update)
+        #signal_data.insert_signal(pair, tf, key, value, df['startTime'].iloc[-1])
     return buy_signals, sell_signals, update
 
 def signals(data, pair, tf, df):
@@ -43,6 +57,9 @@ def signals(data, pair, tf, df):
     return split_signals(signals, data, pair, tf, df)
 
 def structure_change(signals, data):
+    print('8888888888888888888888888888888888')
+    print(data)
+    print(signals)
     previous_signals = list(filter(lambda x: x['created_at'] == signals[0]['created_at'], signals))
     previous_signals_dict = {}
     for value in previous_signals:
@@ -52,7 +69,13 @@ def structure_change(signals, data):
         if value:
             current_signals[key] = value
     shared_items = {k: previous_signals_dict[k] for k in previous_signals_dict if k in current_signals and previous_signals_dict[k] == current_signals[k]}
-    return len(previous_signals_dict) != len(shared_items)
+
+    print('00000000000000000000000000000000000000')
+
+    print(len(previous_signals_dict))
+    print(len(shared_items))
+
+    return (len(previous_signals_dict) != len(shared_items)) or len(signals) == 0
 
 def go():
     strategy = s.Strategy()
@@ -60,12 +83,28 @@ def go():
     ftx = f.FtxClient(alpha["ftx_key"], alpha["ftx_secret"])
     tf = 86400
     for pair in alpha["pairs"]:
+        print(pair['pair'])
         for tf in alpha["timeframes"]:
+
+            print(tf['seconds'])
+            df = None
+            data = None
             df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf['seconds']))
             data, df = strategy.setup(df, tf['seconds'], pair['pair'])
+
+            #print(data)
+
+
             buy_signals, sell_signals, update = signals(data, pair['pair'], tf['seconds'], df)
 
+
             if update:
+                for item in buy_signals + sell_signals:
+                    for key, value in item.items():
+                        #print(value)
+                        signal_data.insert_signal(pair['pair'], tf['seconds'], key, value, df['startTime'].iloc[-1])
+
+
                 tweet(buy_signals, sell_signals)
 
             u.show('Market', pair['label'])

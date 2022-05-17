@@ -10,6 +10,9 @@ class Data:
     def signal_keys(self):
         return ['at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_over_signal', 'macd_over_centerline', 'macd_rising'], ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_under_signal', 'macd_under_centerline', 'macd_dropping']
 
+    def get_signals(self, limit):
+        return self.signal_data.get_all_signals(limit)
+
     def get_recent_signals(self, pair, tf):
         signals = self.signal_data.get_signals(pair, tf)
         return list(filter(lambda x: x['created_at'] == signals[0]['created_at'], signals))
@@ -34,6 +37,8 @@ class Data:
                 if key in sell_signal_keys:
                     data[pair['pair']][tf['seconds']]['bearish']['signals'].append({'key' : key, 'value' : value})
         return data
+
+
 
     def signals(self):
         data = {}
