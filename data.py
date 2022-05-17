@@ -1,7 +1,10 @@
 import models.signal_model as sm
 import signal as s
 import cfg_load
-alpha = cfg_load.load('alpha.yaml')
+import os
+dir = os.path.dirname(os.path.realpath(__file__))
+path = os.path.join(dir, 'alpha.yaml')
+alpha = cfg_load.load(path)
 
 class Data:
     def __init__(self):
@@ -37,8 +40,6 @@ class Data:
                 if key in sell_signal_keys:
                     data[pair['pair']][tf['seconds']]['bearish']['signals'].append({'key' : key, 'value' : value})
         return data
-
-
 
     def signals(self):
         data = {}
