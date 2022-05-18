@@ -1,28 +1,27 @@
 import data as d
+import os
+import cfg_load
+dir = os.path.dirname(os.path.realpath(__file__))
+path = os.path.join(dir, 'alpha.yaml')
+alpha = cfg_load.load(path)
 
 class Drop:
     def __init__(self):
         self.data = d.Data()
 
     def history(self):
-        return self.data.get_signals(10)
+        data = []
+        for pair in alpha["pairs"]:
+            for tf in alpha["timeframes"]:
+                data.append({'pair': pair, 'timeframe': tf, 'signals': self.data.get_recent_signals(pair['pair'], tf['seconds'])})
+        return data
 
     def alpha(self):
         #macd_rising_following_oversold_divergence
-        data = self.data.signals()
-        data = self.directions(data)
-        return data
-
-    def directions(self, data):
-        for pk,pv  in data.items():
-            print(pk)
-            for tk,tv  in pv.items():
-                print(tk)
-                for sk, sv  in tv.items():
-                    print(sk)
-                    for ck, cv  in sv.items():
-                        print(ck)
-                        print(cv)
-                        for item in cv:
-                            print(item['key'])
+        data = []
+        for pair in alpha["pairs"]:
+            for tf in alpha["timeframes"]:
+                signals = self.data.get_recent_signals(pair['pair'], tf['seconds'])
+                signals = self.data.split_signals(signals, pair['pair'], tf['seconds'])
+                data.append({'pair': pair, 'timeframe': tf, 'signals': signals})
         return data

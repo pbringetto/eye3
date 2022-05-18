@@ -1,21 +1,50 @@
-{% for pk,pv  in data.items() %}
-    <h1>{{pk}}</h1>
-    {% for tk,tv  in pv.items() %}
-        <h2>{{tk}}</h2>
-        {% for sk, sv  in tv.items() %}
-            <div>
-                <h4>{{sk}}</h4>
-                {% for ck, cv  in sv.items() %}
-                <div>
-                    <h5>{{ck}}</h5>
-                    {% for item in cv %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>Signals</title>
+    <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="starter-template.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    {% for item in data %}
+    <div class="row mb-3">
+        <div class="col-4 themed-grid-col">
+            <h2>{{item.pair.label}} - {{item.timeframe.label}}</h2>
+        </div>
+
+        <div class="col-4 themed-grid-col">
+            {% for signal in item.signals %}
+                {% if signal.signals.buy_signals %}
+                    <h4>Buy Signals</h4>
                     <div>
-                        {{item.value}}
+                        {% for item in signal.signals.buy_signals %}
+                        <div>{{item.value}}</div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
+                {% endif %}
+
+                {% if signal.signals.sell_signals %}
+                    <h4>Sell Signals</h4>
+                    <div>
+                        {% for item in signal.signals.sell_signals %}
+                        <div>{{item.value}}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
     {% endfor %}
-{% endfor %}
+</div>
+</body>
+</html>
+
+
+
