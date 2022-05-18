@@ -17,7 +17,7 @@
     <table class="table table-striped table-hover">
         <thead>
         <tr>
-            <th scope="col">Pair</th>
+            <th scope="col">Market</th>
             <th scope="col">Timeframe</th>
             <th scope="col">Last Update</th>
             <th scope="col">Buy Signals</th>
@@ -28,27 +28,24 @@
 
         {% for item in data %}
         <tr>
-            <th scope="row">{{item.pair.label}}</th>
+            <th scope="row">
+                <div>{{item.pair.label}}</div>
+                <div>${{item.price}}</div>
+            </th>
             <td>{{item.timeframe.label}}</td>
             <td>{{item.updated}}</td>
-
             <td>{% for signal in item.signals %}
-
                 {% if signal.signals.buy_signals %}
-                <h5>Buy Signals</h5>
                 <ul>
                     {% for item in signal.signals.buy_signals %}
                     <li>{{item.value}}</li>
                     {% endfor %}
                 </ul>
                 {% endif %}
-
                 {% endfor %}</td>
 
             <td>{% for signal in item.signals %}
-
                 {% if signal.signals.sell_signals %}
-                <h5>Sell Signals</h5>
                 <ul>
                     {% for item in signal.signals.sell_signals %}
                     <li>{{item.value}}</li>
