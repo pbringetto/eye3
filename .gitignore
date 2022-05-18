@@ -1,3 +1,7 @@
+alpha.yaml
+log.txt
+.env
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

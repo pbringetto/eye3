@@ -24,7 +24,6 @@ class Data:
         buy_signals = []
         buy_signal_keys, sell_signal_keys = self.signal_keys()
         for item in signals:
-            print(item)
             if item['key'] in buy_signal_keys:
                 buy_signals.append(item)
             if item['key'] in sell_signal_keys:

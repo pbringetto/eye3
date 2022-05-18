@@ -22,6 +22,7 @@ class Drop:
         for pair in alpha["pairs"]:
             for tf in alpha["timeframes"]:
                 signals = self.data.get_recent_signals(pair['pair'], tf['seconds'])
+                updated = signals[0]['created_at']
                 signals = self.data.split_signals(signals, pair['pair'], tf['seconds'])
-                data.append({'pair': pair, 'timeframe': tf, 'signals': signals})
+                data.append({'pair': pair, 'timeframe': tf, 'signals': signals, 'updated': updated})
         return data
