@@ -24,7 +24,7 @@ class SignalDataModel:
         params = (timeframe, pair, key, )
         return self.model.select_one(sql, params)
 
-    def insert_signal(self, pair, timeframe, key, value, ohlc_timestamp):
-        sql = "INSERT IGNORE INTO `signal` (pair, timeframe, `key`, `value`, ohlc_timestamp) VALUES (%s, %s, %s, %s, %s)"
-        params = (pair, timeframe, key, value, ohlc_timestamp, )
+    def insert_signal(self, pair, timeframe, key, value, ohlc_timestamp, price):
+        sql = "INSERT IGNORE INTO `signal` (pair, timeframe, `key`, `value`, ohlc_timestamp, price) VALUES (%s, %s, %s, %s, %s, %s)"
+        params = (pair, timeframe, key, value, ohlc_timestamp, price, )
         return self.model.insert(sql, params)
