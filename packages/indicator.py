@@ -8,7 +8,33 @@ import math
 pd.options.mode.chained_assignment = None
 
 class Indicator:
-    def bollinger(self, df, time_frame):
+
+    def on_balance_volume(self, df, n):
+        """Calculate On-Balance Volume for given data.
+
+        :param df: pandas.DataFrame
+        :param n:
+        :return: pandas.DataFrame
+        """
+        i = 0
+        OBV = [0]
+        while i < df.index[-1]:
+            if df.loc[i + 1, 'close'] - df.loc[i, 'close'] > 0:
+                OBV.append(df.loc[i + 1, 'volume'])
+            if df.loc[i + 1, 'close'] - df.loc[i, 'close'] == 0:
+                OBV.append(0)
+            if df.loc[i + 1, 'close'] - df.loc[i, 'close'] < 0:
+                OBV.append(-df.loc[i + 1, 'volume'])
+            i = i + 1
+        OBV = pd.Series(OBV)
+        OBV_ma = pd.Series(OBV.rolling(n, min_periods=n).mean(), name='obv')
+        df = df.join(OBV_ma)
+        data = {
+                    'on_balance_volume': False,
+                }
+        return data, df
+
+    def bollinger(self, df):
 
         tp = (df['close'] + df['low'] + df['high'])/3
         df['std'] = tp.rolling(20).std(ddof=0)
@@ -26,7 +52,7 @@ class Indicator:
         return data, df
 
 
-    def ma(self, df, time_frame):
+    def ma(self, df):
         df['ma20'] = df['close'].rolling(20).mean()
         df['ma50'] = df['close'].rolling(50).mean()
         df['ma100'] = df['close'].rolling(100).mean()
@@ -46,7 +72,7 @@ class Indicator:
         return data, df
 
 
-    def ema(self, df, time_frame):
+    def ema(self, df):
 
         df['ema20'] = df['close'].ewm(span=20, adjust=False).mean()
         df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
@@ -65,7 +91,7 @@ class Indicator:
         }
         return data, df
 
-    def rsi(self, df, time_frame):
+    def rsi(self, df):
         df = self.get_rsi(df)
         data = {
             'rsi_oversold': 'RSI is Oversold' if df['rsi'].iloc[-1] <= 30 else False,
@@ -73,7 +99,7 @@ class Indicator:
         }
         return data, df
 
-    def macd_slope(self, ohlc, time_frame):
+    def macd_slope(self, ohlc):
         ohlc.ta.macd(close='close', fast=12, slow=26, signal=9, append=True)
         ohlc['macd_slope'] = ohlc['MACD_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
         ohlc['macd_sig_slope'] = ohlc['MACDs_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
@@ -97,7 +123,7 @@ class Indicator:
     def top_idx(self, df, key, order):
         return argrelextrema(df[key].values, np.greater_equal, order=order)[0]
 
-    def peak_slope(self, df, tf, key):
+    def peak_slope(self, df, key):
         bottom_idx = self.bottom_idx(df, key, 21)
         top_idx = self.top_idx(df, key, 21)
         b = df.iloc[bottom_idx].copy()
@@ -110,14 +136,14 @@ class Indicator:
         t[f'{key}_highs_slope'] = t[key].rolling(window=4).apply(self.get_slope, raw=True)
         return b[f'{key}_lows_slope'].iloc[-1], t[f'{key}_highs_slope'].iloc[-1], df
 
-    def peaks(self, df, tf):
-        close_bottom_slope, close_top_slope, df = self.peak_slope(df, tf, 'close')
-        rsi_bottom_slope, rsi_top_slope, df = self.peak_slope(df, tf, 'rsi')
+    def peaks(self, df):
+        close_bottom_slope, close_top_slope, df = self.peak_slope(df, 'close')
+        rsi_bottom_slope, rsi_top_slope, df = self.peak_slope(df, 'rsi')
         df.merge(df)
         return close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df
 
-    def divergence(self, ohlc, tf):
-        close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df = self.peaks(ohlc, tf)
+    def divergence(self, ohlc):
+        close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df = self.peaks(ohlc)
         bullish_regular = (close_bottom_slope < 0) and (rsi_bottom_slope > 0)
         bullish_hidden = (rsi_top_slope < 0) and (close_bottom_slope > 0)
         bearish_regular = (close_top_slope > 0) and (rsi_top_slope < 0)

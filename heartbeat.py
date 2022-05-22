@@ -14,6 +14,8 @@ pd.set_option('display.max_columns', 1000)
 pd.set_option('display.width', 1000)
 import models.signal_model as sm
 signal_data = sm.SignalDataModel()
+import time
+from datetime import datetime
 
 class Heartbeat:
     def __init__(self):
@@ -62,16 +64,19 @@ class Heartbeat:
         ftx = f.FtxClient(alpha["ftx_key"], alpha["ftx_secret"])
         tf = 86400
         for pair in alpha["pairs"]:
-            #print(pair['pair'])
+            print(pair['pair'])
             single_market = ftx.get_single_market(pair['pair'])
 
+
+
+            price = single_market['price']
             for tf in alpha["timeframes"]:
 
-                #print(tf['seconds'])
-                #df = None
-                #data = None
+
                 df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf['seconds']))
 
+                volume = 0
+                df.loc[len(df.index)] = [pd.to_datetime(datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00")), 0, price, price, price, price, volume]
 
                 data, df = strategy.setup(df, tf['seconds'], pair['pair'])
                 buy_signals, sell_signals, update = self.signals(data, pair['pair'], tf['seconds'], df)
