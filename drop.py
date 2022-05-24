@@ -22,9 +22,9 @@ class Drop:
         for pair in alpha["pairs"]:
             for tf in alpha["timeframes"]:
                 signals = self.data.get_recent_signals(pair['pair'], tf['seconds'])
-
                 updated =  signals[0]['created_at'] if signals else 0
                 price =  signals[0]['price'] if signals else 0
-                signals = self.data.split_signals(signals, pair['pair'], tf['seconds'])
-                data.append({'pair': pair, 'timeframe': tf, 'signals': signals, 'updated': updated, 'price': price})
+                buy_signals, sell_signals = self.data.split_signals(signals)
+                data.append({'pair': pair, 'timeframe': tf, 'signals': {'buy_signals': buy_signals, 'sell_signals': sell_signals}, 'updated': updated, 'price': price})
+                print(data)
         return data

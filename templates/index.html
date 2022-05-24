@@ -35,26 +35,24 @@
             </th>
             <td>{{item.timeframe.label}}</td>
             <td>{{item.updated}}</td>
-            <td>{% for signal in item.signals %}
-                {% if signal.signals.buy_signals %}
+
+            <td>{% if item.signals.buy_signals %}
                 <ul>
-                    {% for item in signal.signals.buy_signals %}
+                    {% for item in item.signals.buy_signals %}
                     <li>{{item.value}}</li>
                     {% endfor %}
                 </ul>
                 {% endif %}
-                {% endfor %}</td>
+            </td>
 
-            <td>{% for signal in item.signals %}
-                {% if signal.signals.sell_signals %}
+            <td>{% if item.signals.sell_signals %}
                 <ul>
-                    {% for item in signal.signals.sell_signals %}
+                    {% for item in item.signals.sell_signals %}
                     <li>{{item.value}}</li>
                     {% endfor %}
                 </ul>
                 {% endif %}
-
-                {% endfor %}</td>
+            </td>
         </tr>
         {% endfor %}
 

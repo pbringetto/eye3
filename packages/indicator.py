@@ -42,12 +42,22 @@ class Indicator:
         df['bollinger_high'] = matp + 2*df['std']
         df['bollinger_low'] = matp - 2*df['std']
 
+        data = {'bollinger_low': df['bollinger_low'].iloc[-1], 'bollinger_high': df['bollinger_high'].iloc[-1]}
+        data = [
+            {'key': 'below_bollinger_low', 'value': 'Below bollinger Low' if df['close'].iloc[-1] < df['bollinger_low'].iloc[-1] else False, 'data': data},
+            {'key': 'above_bollinger_high', 'value': 'Above bollinger high' if df['close'].iloc[-1] > df['bollinger_high'].iloc[-1] else False, 'data': data},
+            {'key': 'at_bollinger_low', 'value': 'At Bollinger low' if math.isclose(df['close'].iloc[-1], df['bollinger_low'].iloc[-1], abs_tol=100) else False, 'data': data},
+            {'key': 'at_bollinger_high', 'value': 'At Bollinger high' if math.isclose(df['close'].iloc[-1], df['bollinger_high'].iloc[-1], abs_tol=100) else False, 'data': data},
+        ]
+
+        '''
         data = {
             'below_bollinger_low': 'Below bollinger Low' if df['close'].iloc[-1] < df['bollinger_low'].iloc[-1] else False,
             'above_bollinger_high': 'Above bollinger high' if df['close'].iloc[-1] > df['bollinger_high'].iloc[-1] else False,
             'at_bollinger_low' : 'At Bollinger low' if math.isclose(df['close'].iloc[-1], df['bollinger_low'].iloc[-1], abs_tol=100) else False,
             'at_bollinger_high' : 'At Bollinger high' if math.isclose(df['close'].iloc[-1], df['bollinger_high'].iloc[-1], abs_tol=100) else False,
         }
+        '''
 
         return data, df
 
@@ -105,6 +115,16 @@ class Indicator:
         ohlc['macd_sig_slope'] = ohlc['MACDs_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
         ohlc['macd_hist_slope'] = ohlc['MACDh_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
 
+
+
+        data = {'macd_slope': ohlc['macd_slope'].iloc[-1], 'macd_signal': ohlc['MACDs_12_26_9'].iloc[-1], 'macd_hist': ohlc['MACDh_12_26_9'].iloc[-1]}
+        data = [
+            {'key': 'macd_rising', 'value': 'MACD is rising' if ohlc['macd_slope'].iloc[-1] >= 8 else False, 'data': data},
+            {'key': 'macd_dropping', 'value': 'MACD is dropping' if ohlc['macd_slope'].iloc[-1] <= 8 else False, 'data': data},
+
+        ]
+
+        '''
         data = {
             'macd_rising': 'MACD is rising' if ohlc['macd_slope'].iloc[-1] >= 8 else False,
             'macd_dropping': 'MACD is dropping' if ohlc['macd_slope'].iloc[-1] <= 8 else False,
@@ -115,6 +135,7 @@ class Indicator:
             'macd_under_centerline': 'MACD under centerline' if ohlc['MACD_12_26_9'].iloc[-1] < 0 else False,
             'macd_signal_crossing_soon' : 'MACD crossover signal soon' if math.isclose(ohlc['MACD_12_26_9'].iloc[-1], ohlc['MACDs_12_26_9'].iloc[-1], abs_tol=100) else False,
         }
+        '''
         return data, ohlc
 
     def bottom_idx(self, df, key, order):
@@ -148,6 +169,17 @@ class Indicator:
         bullish_hidden = (rsi_top_slope < 0) and (close_bottom_slope > 0)
         bearish_regular = (close_top_slope > 0) and (rsi_top_slope < 0)
         bearish_hidden = (close_top_slope < 0) and (rsi_top_slope > 0)
+
+
+        data = {'close_bottom_slope': close_bottom_slope, 'close_top_slope': close_top_slope, 'rsi_bottom_slope': rsi_bottom_slope, 'rsi_top_slope': rsi_top_slope}
+        data = [
+            {'key': 'bullish_regular', 'value': 'Bullish divergence' if bullish_regular else False, 'data': data},
+            {'key': 'bullish_hidden', 'value': 'Hidden Bullish divergence' if bullish_hidden else False, 'data': data},
+            {'key': 'bearish_regular', 'value': 'Bearish divergence' if bearish_regular else False, 'data': data},
+            {'key': 'bearish_hidden', 'value': 'Hidden Bearish divergence' if bearish_hidden else False, 'data': data},
+        ]
+
+        '''
         data = {
              #'close_bottom_slope': close_bottom_slope,
              #'close_top_slope': close_top_slope,
@@ -158,6 +190,9 @@ class Indicator:
              'bearish_regular': 'Bearish divergence' if bearish_regular else False,
              'bearish_hidden': 'Hidden Bearish divergence' if bearish_hidden else False,
         }
+        '''
+
+
         return data, ohlc
 
     def get_slope(self, array):
