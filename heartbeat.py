@@ -24,7 +24,7 @@ class Heartbeat:
 
     def signals(self, data, pair, tf, df):
         signals = self.data.get_signals(pair, tf)
-        buy_signals, sell_signals = self.data.split_signals(signals)
+        buy_signals, sell_signals = self.data.split_signals(data)
         update = self.data.structure_change(signals, data)
         return buy_signals, sell_signals, update
 
@@ -46,13 +46,6 @@ class Heartbeat:
                     for item in buy_signals + sell_signals:
                         signal_data.insert_signal(pair['pair'], tf['seconds'], item['key'], item['value'], df['startTime'].iloc[-1], single_market['price'])
                     self.tweet(buy_signals, sell_signals)
-
-                #u.show('Market', pair['label'])
-                #u.show('Timeframe', tf['label'])
-                #u.show('Price', df['close'].iloc[-1])
-                #u.show('Open Price', df['open'].iloc[-1])
-                #u.show('High', df['high'].iloc[-1])
-                #u.show('Low', df['low'].iloc[-1])
 
                 print('bullish case------------------------------------')
                 for value in buy_signals:

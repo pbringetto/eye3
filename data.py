@@ -2,6 +2,7 @@ import models.signal_model as sm
 import signal as s
 import cfg_load
 import os
+import helpers.util as u
 dir = os.path.dirname(os.path.realpath(__file__))
 path = os.path.join(dir, 'alpha.yaml')
 alpha = cfg_load.load(path)
@@ -21,28 +22,13 @@ class Data:
         signals = list(filter(lambda x: x['created_at'] == signals[0]['created_at'], signals))
         return signals
 
-    def split_list(self, list, key, key_list_1, key_list_2):
-        l1, l2 = [], []
-        for item in list:
-            if item[key] in key_list_1:
-                l1.append(item)
-            if item[key] in key_list_2:
-                l2.append(item)
-        return l1, l2
-
     def split_signals(self, signals):
         buy_signal_keys, sell_signal_keys = self.signal_keys()
-        buy_signals, sell_signals = self.split_list(signals, 'key', buy_signal_keys, sell_signal_keys)
+        buy_signals, sell_signals = u.split_list(signals, 'key', buy_signal_keys, sell_signal_keys)
         return buy_signals, sell_signals
 
     def structure_change(self, signals, data):
-        previous_signals = list(filter(lambda x: x['created_at'] == signals[0]['created_at'], signals))
-        previous_signals_dict = {}
-        for value in previous_signals:
-            previous_signals_dict[value['key']] = value['value']
-        current_signals = {}
-        for item in signals:
-            if item['value']:
-                current_signals[item['key']] = item['value']
-        shared_items = {k: previous_signals_dict[k] for k in previous_signals_dict if k in current_signals and previous_signals_dict[k] == current_signals[k]}
-        return (len(previous_signals_dict) != len(shared_items)) or len(signals) == 0
+        previous_signals = u.list_to_dict(u.filter_list(signals, 'created_at', signals[0]['created_at']), 'key', 'value')
+        current_signals = u.list_to_dict(data, 'key', 'value', True)
+        shared_signals = u.shared_items(previous_signals, current_signals)
+        return (len(previous_signals) != len(shared_signals)) or len(signals) == 0

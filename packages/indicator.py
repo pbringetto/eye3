@@ -8,6 +8,8 @@ import math
 pd.options.mode.chained_assignment = None
 
 class Indicator:
+    def __init__(self):
+        self.data = []
 
     def on_balance_volume(self, df, n):
         """Calculate On-Balance Volume for given data.
