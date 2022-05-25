@@ -20,7 +20,6 @@ class Strategy:
 
         print(ohlc[['close', 'volume', 'bollinger_low', 'bollinger_high']].iloc[-20:])
 
-        #data = {**div_data, **macd_data, **rsi_data, **ma_data, **ema_data, **bollinger_data}
-        data = div_data + bollinger_data + macd_data
+        data = div_data + bollinger_data + macd_data + ma_data + ema_data
 
         return data, ohlc

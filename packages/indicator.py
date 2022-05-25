@@ -51,18 +51,7 @@ class Indicator:
             {'key': 'at_bollinger_low', 'value': 'At Bollinger low' if math.isclose(df['close'].iloc[-1], df['bollinger_low'].iloc[-1], abs_tol=100) else False, 'data': data},
             {'key': 'at_bollinger_high', 'value': 'At Bollinger high' if math.isclose(df['close'].iloc[-1], df['bollinger_high'].iloc[-1], abs_tol=100) else False, 'data': data},
         ]
-
-        '''
-        data = {
-            'below_bollinger_low': 'Below bollinger Low' if df['close'].iloc[-1] < df['bollinger_low'].iloc[-1] else False,
-            'above_bollinger_high': 'Above bollinger high' if df['close'].iloc[-1] > df['bollinger_high'].iloc[-1] else False,
-            'at_bollinger_low' : 'At Bollinger low' if math.isclose(df['close'].iloc[-1], df['bollinger_low'].iloc[-1], abs_tol=100) else False,
-            'at_bollinger_high' : 'At Bollinger high' if math.isclose(df['close'].iloc[-1], df['bollinger_high'].iloc[-1], abs_tol=100) else False,
-        }
-        '''
-
         return data, df
-
 
     def ma(self, df):
         df['ma20'] = df['close'].rolling(20).mean()
@@ -70,75 +59,68 @@ class Indicator:
         df['ma100'] = df['close'].rolling(100).mean()
         df['ma200'] = df['close'].rolling(200).mean()
 
-
-        data = {
-            'above_ma_20': 'Above 20 period moving average' if df['close'].iloc[-1] > df['ma20'].iloc[-1] else False,
-            'above_ma_50': 'Above 50 period moving average' if df['close'].iloc[-1] > df['ma50'].iloc[-1] else False,
-            'above_ma_100': 'Above 100 period moving average' if df['close'].iloc[-1] > df['ma100'].iloc[-1] else False,
-            'above_ma_200': 'Above 200 period moving average' if df['close'].iloc[-1] > df['ma200'].iloc[-1] else False,
-            'below_ma_20': 'Below 20 period moving average' if df['close'].iloc[-1] > df['ma20'].iloc[-1] else False,
-            'below_ma_50': 'Below 50 period moving average' if df['close'].iloc[-1] > df['ma50'].iloc[-1] else False,
-            'below_ma_100': 'Below 100 period moving average' if df['close'].iloc[-1] > df['ma100'].iloc[-1] else False,
-            'below_ma_200': 'Below 200 period moving average' if df['close'].iloc[-1] > df['ma200'].iloc[-1] else False,
-        }
+        data = {'ma20': df['ma20'].iloc[-1], 'ma50': df['ma50'].iloc[-1], 'ma100': df['ma100'].iloc[-1], 'ma200': df['ma200'].iloc[-1]}
+        data = [
+            {'key': 'above_ma_20', 'value': 'Above 20 period moving average' if df['close'].iloc[-1] > df['ma20'].iloc[-1] else False, 'data': data},
+            {'key': 'above_ma_50', 'value': 'Above 50 period moving average' if df['close'].iloc[-1] > df['ma50'].iloc[-1] else False, 'data': data},
+            {'key': 'above_ma_100', 'value': 'Above 100 period moving average' if df['close'].iloc[-1] > df['ma100'].iloc[-1] else False, 'data': data},
+            {'key': 'above_ma_200', 'value': 'Above 200 period moving average' if df['close'].iloc[-1] > df['ma200'].iloc[-1] else False, 'data': data},
+            {'key': 'below_ma_20', 'value': 'Below 20 period moving average' if df['close'].iloc[-1] > df['ma20'].iloc[-1] else False, 'data': data},
+            {'key': 'below_ma_50', 'value': 'Below 50 period moving average' if df['close'].iloc[-1] > df['ma50'].iloc[-1] else False, 'data': data},
+            {'key': 'below_ma_100', 'value': 'Below 100 period moving average' if df['close'].iloc[-1] > df['ma100'].iloc[-1] else False, 'data': data},
+            {'key': 'below_ma_200', 'value': 'Below 200 period moving average' if df['close'].iloc[-1] > df['ma200'].iloc[-1] else False, 'data': data},
+        ]
         return data, df
 
 
     def ema(self, df):
-
         df['ema20'] = df['close'].ewm(span=20, adjust=False).mean()
         df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
         df['ema100'] = df['close'].ewm(span=100, adjust=False).mean()
         df['ema200'] = df['close'].ewm(span=200, adjust=False).mean()
 
-        data = {
-            'above_ema_20': 'Above 20 period moving average' if df['close'].iloc[-1] > df['ema20'].iloc[-1] else False,
-            'above_ema_50': 'Above 50 period moving average' if df['close'].iloc[-1] > df['ema50'].iloc[-1] else False,
-            'above_ema_100': 'Above 100 period moving average' if df['close'].iloc[-1] > df['ema100'].iloc[-1] else False,
-            'above_ema_200': 'Above 200 period moving average' if df['close'].iloc[-1] > df['ema200'].iloc[-1] else False,
-            'below_ema_20': 'Below 20 period moving average' if df['close'].iloc[-1] > df['ema20'].iloc[-1] else False,
-            'below_ema_50': 'Below 50 period moving average' if df['close'].iloc[-1] > df['ema50'].iloc[-1] else False,
-            'below_ema_100': 'Below 100 period moving average' if df['close'].iloc[-1] > df['ema100'].iloc[-1] else False,
-            'below_ema_200': 'Below 200 period moving average' if df['close'].iloc[-1] > df['ema200'].iloc[-1] else False,
-        }
+        data = {'ema20': df['ema20'].iloc[-1], 'ema50': df['ema50'].iloc[-1], 'ema100': df['ema100'].iloc[-1], 'ema200': df['ema200'].iloc[-1]}
+        data = [
+            {'key': 'above_ema_20', 'value': 'Above 20 period exponential moving average' if df['close'].iloc[-1] > df['ema20'].iloc[-1] else False, 'data': data},
+            {'key': 'above_ema_50', 'value': 'Above 50 period exponential moving average' if df['close'].iloc[-1] > df['ema50'].iloc[-1] else False, 'data': data},
+            {'key': 'above_ema_100', 'value': 'Above 100 period exponential moving average' if df['close'].iloc[-1] > df['ema100'].iloc[-1] else False, 'data': data},
+            {'key': 'above_ema_200', 'value': 'Above 200 period exponential moving average' if df['close'].iloc[-1] > df['ema200'].iloc[-1] else False, 'data': data},
+            {'key': 'below_ema_20', 'value': 'Below 20 period exponential moving average' if df['close'].iloc[-1] > df['ema20'].iloc[-1] else False, 'data': data},
+            {'key': 'below_ema_50', 'value': 'Below 50 period exponential moving average' if df['close'].iloc[-1] > df['ema50'].iloc[-1] else False, 'data': data},
+            {'key': 'below_ema_100', 'value': 'Below 100 period exponential moving average' if df['close'].iloc[-1] > df['ema100'].iloc[-1] else False, 'data': data},
+            {'key': 'below_ema_200', 'value': 'Below 200 period exponential moving average' if df['close'].iloc[-1] > df['ema200'].iloc[-1] else False, 'data': data},
+        ]
         return data, df
 
     def rsi(self, df):
         df = self.get_rsi(df)
-        data = {
-            'rsi_oversold': 'RSI is Oversold' if df['rsi'].iloc[-1] <= 30 else False,
-            'rsi_overbought': 'RSI is Overbought' if df['rsi'].iloc[-1] >= 70 else False
-        }
+
+        data = {'rsi': df['rsi'].iloc[-1]}
+        data = [
+            {'key': 'rsi_oversold', 'value': 'RSI is oversold' if df['rsi'].iloc[-1] <= 30 and df['rsi'].iloc[-1] >= 20 else False, 'data': data},
+            {'key': 'rsi_extremely_oversold', 'value': 'RSI is extremely oversold' if df['rsi'].iloc[-1] <= 20 else False, 'data': data},
+            {'key': 'rsi_overbought', 'value': 'RSI is overbought' if df['rsi'].iloc[-1] >= 70  and df['rsi'].iloc[-1] <= 80 else False, 'data': data},
+            {'key': 'rsi_extremely_overbought', 'value': 'RSI is extremely overbought' if df['rsi'].iloc[-1] >= 80 else False, 'data': data},
+        ]
         return data, df
 
-    def macd_slope(self, ohlc):
-        ohlc.ta.macd(close='close', fast=12, slow=26, signal=9, append=True)
-        ohlc['macd_slope'] = ohlc['MACD_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
-        ohlc['macd_sig_slope'] = ohlc['MACDs_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
-        ohlc['macd_hist_slope'] = ohlc['MACDh_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
-
-
-
-        data = {'macd_slope': ohlc['macd_slope'].iloc[-1], 'macd_signal': ohlc['MACDs_12_26_9'].iloc[-1], 'macd_hist': ohlc['MACDh_12_26_9'].iloc[-1]}
+    def macd_slope(self, df):
+        df.ta.macd(close='close', fast=12, slow=26, signal=9, append=True)
+        df['macd_slope'] = df['MACD_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
+        df['macd_sig_slope'] = df['MACDs_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
+        df['macd_hist_slope'] = df['MACDh_12_26_9'].rolling(window=2).apply(self.get_slope, raw=True)
+        data = {'macd_slope': df['macd_slope'].iloc[-1], 'macd_signal': df['MACDs_12_26_9'].iloc[-1], 'macd_hist': df['MACDh_12_26_9'].iloc[-1]}
         data = [
-            {'key': 'macd_rising', 'value': 'MACD is rising' if ohlc['macd_slope'].iloc[-1] >= 8 else False, 'data': data},
-            {'key': 'macd_dropping', 'value': 'MACD is dropping' if ohlc['macd_slope'].iloc[-1] <= 8 else False, 'data': data},
-
+            {'key': 'macd_rising', 'value': 'MACD is rising' if df['macd_slope'].iloc[-1] >= 8 else False, 'data': data},
+            {'key': 'macd_dropping', 'value': 'MACD is dropping' if df['macd_slope'].iloc[-1] <= 8 else False, 'data': data},
+            {'key': 'cross_soon', 'value': 'MACD Crossover soon' if math.isclose(df['MACD_12_26_9'].iloc[-1], df['MACDs_12_26_9'].iloc[-1], abs_tol=100) else False, 'data': data},
+            {'key': 'macd_over_signal', 'value': 'MACD over Signal' if df['MACD_12_26_9'].iloc[-1] > df['MACDs_12_26_9'].iloc[-1] else False, 'data': data},
+            {'key': 'macd_over_centerline', 'value': 'MACD over centerline' if df['MACD_12_26_9'].iloc[-1] > 0 else False, 'data': data},
+            {'key': 'macd_under_signal', 'value': 'MACD under Signal' if df['MACD_12_26_9'].iloc[-1] < df['MACDs_12_26_9'].iloc[-1] else False, 'data': data},
+            {'key': 'macd_under_centerline', 'value': 'MACD under centerline' if df['MACD_12_26_9'].iloc[-1] < 0 else False, 'data': data},
+            {'key': 'macd_signal_crossing_soon', 'value': 'MACD crossover signal soon' if math.isclose(df['MACD_12_26_9'].iloc[-1], df['MACDs_12_26_9'].iloc[-1], abs_tol=100) else False, 'data': data},
         ]
-
-        '''
-        data = {
-            'macd_rising': 'MACD is rising' if ohlc['macd_slope'].iloc[-1] >= 8 else False,
-            'macd_dropping': 'MACD is dropping' if ohlc['macd_slope'].iloc[-1] <= 8 else False,
-            'cross_soon' : 'MACD Crossover soon' if math.isclose(ohlc['MACD_12_26_9'].iloc[-1], ohlc['MACDs_12_26_9'].iloc[-1], abs_tol=100) else False,
-            'macd_over_signal': 'MACD over Signal' if ohlc['MACD_12_26_9'].iloc[-1] > ohlc['MACDs_12_26_9'].iloc[-1] else False,
-            'macd_over_centerline': 'MACD over centerline' if ohlc['MACD_12_26_9'].iloc[-1] > 0 else False,
-            'macd_under_signal': 'MACD under Signal' if ohlc['MACD_12_26_9'].iloc[-1] < ohlc['MACDs_12_26_9'].iloc[-1] else False,
-            'macd_under_centerline': 'MACD under centerline' if ohlc['MACD_12_26_9'].iloc[-1] < 0 else False,
-            'macd_signal_crossing_soon' : 'MACD crossover signal soon' if math.isclose(ohlc['MACD_12_26_9'].iloc[-1], ohlc['MACDs_12_26_9'].iloc[-1], abs_tol=100) else False,
-        }
-        '''
-        return data, ohlc
+        return data, df
 
     def bottom_idx(self, df, key, order):
         return argrelextrema(df[key].values, np.less_equal, order=order)[0]
@@ -165,14 +147,12 @@ class Indicator:
         df.merge(df)
         return close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df
 
-    def divergence(self, ohlc):
-        close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df = self.peaks(ohlc)
+    def divergence(self, df):
+        close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df = self.peaks(df)
         bullish_regular = (close_bottom_slope < 0) and (rsi_bottom_slope > 0)
         bullish_hidden = (rsi_top_slope < 0) and (close_bottom_slope > 0)
         bearish_regular = (close_top_slope > 0) and (rsi_top_slope < 0)
         bearish_hidden = (close_top_slope < 0) and (rsi_top_slope > 0)
-
-
         data = {'close_bottom_slope': close_bottom_slope, 'close_top_slope': close_top_slope, 'rsi_bottom_slope': rsi_bottom_slope, 'rsi_top_slope': rsi_top_slope}
         data = [
             {'key': 'bullish_regular', 'value': 'Bullish divergence' if bullish_regular else False, 'data': data},
@@ -180,22 +160,7 @@ class Indicator:
             {'key': 'bearish_regular', 'value': 'Bearish divergence' if bearish_regular else False, 'data': data},
             {'key': 'bearish_hidden', 'value': 'Hidden Bearish divergence' if bearish_hidden else False, 'data': data},
         ]
-
-        '''
-        data = {
-             #'close_bottom_slope': close_bottom_slope,
-             #'close_top_slope': close_top_slope,
-             #'rsi_bottom_slope': rsi_bottom_slope,
-             #'rsi_top_slope': rsi_top_slope,
-             'bullish_regular': 'Bullish divergence' if bullish_regular else False,
-             'bullish_hidden': 'Hidden Bullish divergence' if bullish_hidden else False,
-             'bearish_regular': 'Bearish divergence' if bearish_regular else False,
-             'bearish_hidden': 'Hidden Bearish divergence' if bearish_hidden else False,
-        }
-        '''
-
-
-        return data, ohlc
+        return data, df
 
     def get_slope(self, array):
         y = np.array(array)
