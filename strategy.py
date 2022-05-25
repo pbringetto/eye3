@@ -18,7 +18,7 @@ class Strategy:
 
         obv_data, ohlc = self.indicator.on_balance_volume(ohlc, 5)
 
-        print(ohlc[['close', 'volume', 'bollinger_low', 'bollinger_high']].iloc[-20:])
+        #print(ohlc[['close', 'volume', 'bollinger_low', 'bollinger_high']].iloc[-20:])
 
         data = div_data + bollinger_data + macd_data + ma_data + ema_data
 

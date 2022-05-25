@@ -42,8 +42,10 @@ class Model:
         cursor = self.connection.cursor()
         cursor.execute(sql, params)
         self.connection.commit()
+        id = cursor.lastrowid
         cursor.close()
         self.connection.close()
+        return id
 
     def update(self, sql, params):
         self.connection = mysql.connector.connect(**self.db_config)

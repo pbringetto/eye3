@@ -28,7 +28,7 @@ class Data:
         return buy_signals, sell_signals
 
     def structure_change(self, signals, data):
-        previous_signals = u.list_to_dict(u.filter_list(signals, 'created_at', signals[0]['created_at']), 'key', 'value')
+        previous_signals = u.list_to_dict(u.filter_list(signals, 'created_at', signals[0]['created_at']), 'key', 'value') if signals else []
         current_signals = u.list_to_dict(data, 'key', 'value', True)
         shared_signals = u.shared_items(previous_signals, current_signals)
         return (len(previous_signals) != len(shared_signals)) or len(signals) == 0

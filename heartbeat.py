@@ -4,6 +4,7 @@ import cfg_load
 import twitter as t
 import data as d
 import os
+
 dir = os.path.dirname(os.path.realpath(__file__))
 path = os.path.join(dir, 'alpha.yaml')
 alpha = cfg_load.load(path)
@@ -42,10 +43,16 @@ class Heartbeat:
                 data, df = strategy.setup(df, tf['seconds'], pair['pair'])
                 buy_signals, sell_signals, update = self.signals(data, pair['pair'], tf['seconds'], df)
 
+
+                #print(df.iloc[-2])
                 if update:
+                    data_id = signal_data.insert_data(df['startTime'].iloc[-1], df['open'].iloc[-1], df['high'].iloc[-1], df['low'].iloc[-1], df['close'].iloc[-1], df['volume'].iloc[-1], df['ma20'].iloc[-1], df['ma50'].iloc[-1], df['ma100'].iloc[-1], df['ma200'].iloc[-1], df['ema20'].iloc[-1], df['ema50'].iloc[-1], df['ema100'].iloc[-1], df['ema200'].iloc[-1], df['std'].iloc[-1], df['bollinger_high'].iloc[-1], df['bollinger_low'].iloc[-1], df['rsi'].iloc[-1], df['MACD_12_26_9'].iloc[-1], df['MACDh_12_26_9'].iloc[-1], df['MACDs_12_26_9'].iloc[-1], df['macd_slope'].iloc[-1], df['macd_sig_slope'].iloc[-1], df['macd_hist_slope'].iloc[-1])
+
                     for item in buy_signals + sell_signals:
-                        signal_data.insert_signal(pair['pair'], tf['seconds'], item['key'], item['value'], df['startTime'].iloc[-1], single_market['price'])
+                        signal_data.insert_signal(pair['pair'], tf['seconds'], item['key'], item['value'], df['startTime'].iloc[-1], data_id)
+
                     self.tweet(buy_signals, sell_signals)
+
 
                 print('bullish case------------------------------------')
                 for value in buy_signals:

@@ -1,4 +1,5 @@
 import models.model as m
+import json
 
 class SignalDataModel:
     def __init__(self):
@@ -24,7 +25,13 @@ class SignalDataModel:
         params = (timeframe, pair, key, )
         return self.model.select_one(sql, params)
 
-    def insert_signal(self, pair, timeframe, key, value, ohlc_timestamp, price):
-        sql = "INSERT IGNORE INTO `signal` (pair, timeframe, `key`, `value`, ohlc_timestamp, price) VALUES (%s, %s, %s, %s, %s, %s)"
-        params = (pair, timeframe, key, value, ohlc_timestamp, price, )
+    def insert_signal(self, pair, timeframe, key, value, ohlc_timestamp, data_id):
+        sql = "INSERT IGNORE INTO `signal` (pair, timeframe, `key`, `value`, ohlc_timestamp, data_id) VALUES (%s, %s, %s, %s, %s, %s)"
+        params = (pair, timeframe, key, value, ohlc_timestamp, data_id, )
         return self.model.insert(sql, params)
+
+    def insert_data(self, ohlc_timestamp, open, high, low, close, volume, ma20, ma50, ma100, ma200, ema20, ema50, ema100, ema200, std, bollinger_high, bollinger_low, rsi, macd, macdh, macds, macd_slope, macd_sig_slope, macd_hist_slope):
+        sql = "INSERT IGNORE INTO `data` (`ohlc_timestamp`, `open`, `high`, `low`, `close`, `volume`, `ma20`, `ma50`, `ma100`, `ma200`, `ema20`, `ema50`, `ema100`, `ema200`, `std`, `bollinger_high`, `bollinger_low`, `rsi`, `macd`, `macdh`, `macds`, `macd_slope`, `macd_sig_slope`, `macd_hist_slope`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        params = (ohlc_timestamp, open, high, low, close, volume, ma20, ma50, ma100, ma200, ema20, ema50, ema100, ema200, std, bollinger_high, bollinger_low, rsi, macd, macdh, macds, macd_slope, macd_sig_slope, macd_hist_slope, )
+        return self.model.insert(sql, params)
+        
