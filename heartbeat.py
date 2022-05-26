@@ -65,10 +65,10 @@ class Heartbeat:
             self.tweet(self.signal_content(data, buy_signals, sell_signals))
 
     def signal_content(self, data, buy_signals, sell_signals):
-        data = data + self.signal_sections(buy_signals, 'Bullish Signals')
+        data = data + self.signal_sections(buy_signals, 'For the Bulls')
         if buy_signals and sell_signals:
             data = data + '\r\n'
-        data = data + self.signal_sections(sell_signals, 'Bearish Signals')
+        data = data + self.signal_sections(sell_signals, 'For the Bears')
         return data
 
     def signal_sections(self, signals, description):
