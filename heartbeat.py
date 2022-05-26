@@ -34,7 +34,6 @@ class Heartbeat:
         ftx = f.FtxClient(alpha["ftx_key"], alpha["ftx_secret"])
         tf = 86400
         for pair in alpha["pairs"]:
-            print(pair['pair'])
             single_market = ftx.get_single_market(pair['pair'])
             price = single_market['price']
             for tf in alpha["timeframes"]:
@@ -43,28 +42,47 @@ class Heartbeat:
                 data, df = strategy.setup(df, tf['seconds'], pair['pair'])
                 buy_signals, sell_signals, update = self.signals(data, pair['pair'], tf['seconds'], df)
 
+                update = True
 
-                #print(df.iloc[-2])
                 if update:
-                    data_id = signal_data.insert_data(df['startTime'].iloc[-1], df['open'].iloc[-1], df['high'].iloc[-1], df['low'].iloc[-1], df['close'].iloc[-1], df['volume'].iloc[-1], df['ma20'].iloc[-1], df['ma50'].iloc[-1], df['ma100'].iloc[-1], df['ma200'].iloc[-1], df['ema20'].iloc[-1], df['ema50'].iloc[-1], df['ema100'].iloc[-1], df['ema200'].iloc[-1], df['std'].iloc[-1], df['bollinger_high'].iloc[-1], df['bollinger_low'].iloc[-1], df['rsi'].iloc[-1], df['MACD_12_26_9'].iloc[-1], df['MACDh_12_26_9'].iloc[-1], df['MACDs_12_26_9'].iloc[-1], df['macd_slope'].iloc[-1], df['macd_sig_slope'].iloc[-1], df['macd_hist_slope'].iloc[-1])
+                    self.save_data(df, pair, tf, buy_signals, sell_signals)
+                    self.post_signals(df, buy_signals, sell_signals, pair, tf)
 
-                    for item in buy_signals + sell_signals:
-                        signal_data.insert_signal(pair['pair'], tf['seconds'], item['key'], item['value'], df['startTime'].iloc[-1], data_id)
+    def save_data(self, df, pair, tf, buy_signals, sell_signals):
+        data_id = signal_data.insert_data(df['startTime'].iloc[-1], df['open'].iloc[-1], df['high'].iloc[-1], df['low'].iloc[-1], df['close'].iloc[-1], df['volume'].iloc[-1], df['ma20'].iloc[-1], df['ma50'].iloc[-1], df['ma100'].iloc[-1], df['ma200'].iloc[-1], df['ema20'].iloc[-1], df['ema50'].iloc[-1], df['ema100'].iloc[-1], df['ema200'].iloc[-1], df['std'].iloc[-1], df['bollinger_high'].iloc[-1], df['bollinger_low'].iloc[-1], df['rsi'].iloc[-1], df['MACD_12_26_9'].iloc[-1], df['MACDh_12_26_9'].iloc[-1], df['MACDs_12_26_9'].iloc[-1], df['macd_slope'].iloc[-1], df['macd_sig_slope'].iloc[-1], df['macd_hist_slope'].iloc[-1])
+        for item in buy_signals + sell_signals:
+            signal_data.insert_signal(pair['pair'], tf['seconds'], item['key'], item['value'], df['startTime'].iloc[-1], data_id)
 
-                    self.tweet(buy_signals, sell_signals)
+    def post_signals(self, df, buy_signals, sell_signals, pair, tf):
+        if buy_signals or sell_signals:
+            utc_datetime = datetime.utcnow()
+            data = '#' + pair['label'] + '\r\n'
+            data = data + '$' + str(df['close'].iloc[-1]) + '\r\n'
+            data = data + str(utc_datetime.strftime("%Y-%m-%d %H:%M:%S")) + '\r\n'
+            data = data + 'Timeframe: ' + tf['label'] + '\r\n\r\n'
+            self.tweet(self.signal_content(data, buy_signals, sell_signals))
 
+    def signal_content(self, data, buy_signals, sell_signals):
+        data = data + self.signal_sections(buy_signals, 'Bullish Signals')
+        if buy_signals and sell_signals:
+            data = data + '\r\n'
+        data = data + self.signal_sections(sell_signals, 'Bearish Signals')
+        return data
 
-                print('bullish case------------------------------------')
-                for value in buy_signals:
-                    print(value['value'])
+    def signal_sections(self, signals, description):
+        data = ''
+        if signals:
+            data = description + ':\r\n'
+            for value in signals:
+                data = data + value['value'] + '\r\n'
+        return data
 
-                print('bearish case------------------------------------')
-                for value in sell_signals:
-                    print(value['value'])
-
-    def tweet(self, buy_signals, sell_signals):
+    def tweet(self, data):
         twitter = t.Twitter()
-        twitter.tweet('hello')
+
+        print(data)
+
+        twitter.tweet(data)
 
 hb = Heartbeat()
 
