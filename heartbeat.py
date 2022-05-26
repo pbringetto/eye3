@@ -4,7 +4,7 @@ import cfg_load
 import twitter as t
 import data as d
 import os
-
+import numpy as np
 dir = os.path.dirname(os.path.realpath(__file__))
 path = os.path.join(dir, 'alpha.yaml')
 alpha = cfg_load.load(path)
@@ -34,9 +34,11 @@ class Heartbeat:
         ftx = f.FtxClient(alpha["ftx_key"], alpha["ftx_secret"])
         tf = 86400
         for pair in alpha["pairs"]:
+
             single_market = ftx.get_single_market(pair['pair'])
             price = single_market['price']
             for tf in alpha["timeframes"]:
+
                 df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf['seconds']))
                 df.loc[len(df.index)] = [pd.to_datetime(datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00")), 0, price, price, price, price, 0]
                 data, df = strategy.setup(df, tf['seconds'], pair['pair'])
@@ -47,7 +49,9 @@ class Heartbeat:
                     self.post_signals(df, buy_signals, sell_signals, pair, tf)
 
     def save_data(self, df, pair, tf, buy_signals, sell_signals):
-        data_id = signal_data.insert_data(df['startTime'].iloc[-1], df['open'].iloc[-1], df['high'].iloc[-1], df['low'].iloc[-1], df['close'].iloc[-1], df['volume'].iloc[-1], df['ma20'].iloc[-1], df['ma50'].iloc[-1], df['ma100'].iloc[-1], df['ma200'].iloc[-1], df['ema20'].iloc[-1], df['ema50'].iloc[-1], df['ema100'].iloc[-1], df['ema200'].iloc[-1], df['std'].iloc[-1], df['bollinger_high'].iloc[-1], df['bollinger_low'].iloc[-1], df['rsi'].iloc[-1], df['MACD_12_26_9'].iloc[-1], df['MACDh_12_26_9'].iloc[-1], df['MACDs_12_26_9'].iloc[-1], df['macd_slope'].iloc[-1], df['macd_sig_slope'].iloc[-1], df['macd_hist_slope'].iloc[-1])
+        ma200 = 0 if np.isnan(df['ma200'].iloc[-1]) else df['ma200'].iloc[-1]
+        ema200 = 0 if np.isnan(df['ma200'].iloc[-1]) else df['ma200'].iloc[-1]
+        data_id = signal_data.insert_data(df['startTime'].iloc[-1], df['open'].iloc[-1], df['high'].iloc[-1], df['low'].iloc[-1], df['close'].iloc[-1], df['volume'].iloc[-1], df['ma20'].iloc[-1], df['ma50'].iloc[-1], df['ma100'].iloc[-1], ma200, df['ema20'].iloc[-1], df['ema50'].iloc[-1], df['ema100'].iloc[-1], ema200, df['std'].iloc[-1], df['bollinger_high'].iloc[-1], df['bollinger_low'].iloc[-1], df['rsi'].iloc[-1], df['MACD_12_26_9'].iloc[-1], df['MACDh_12_26_9'].iloc[-1], df['MACDs_12_26_9'].iloc[-1], df['macd_slope'].iloc[-1], df['macd_sig_slope'].iloc[-1], df['macd_hist_slope'].iloc[-1])
         for item in buy_signals + sell_signals:
             signal_data.insert_signal(pair['pair'], tf['seconds'], item['key'], item['value'], df['startTime'].iloc[-1], data_id)
 
