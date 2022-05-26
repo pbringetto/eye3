@@ -34,4 +34,8 @@ class SignalDataModel:
         sql = "INSERT IGNORE INTO `data` (`ohlc_timestamp`, `open`, `high`, `low`, `close`, `volume`, `ma20`, `ma50`, `ma100`, `ma200`, `ema20`, `ema50`, `ema100`, `ema200`, `std`, `bollinger_high`, `bollinger_low`, `rsi`, `macd`, `macdh`, `macds`, `macd_slope`, `macd_sig_slope`, `macd_hist_slope`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         params = (ohlc_timestamp, open, high, low, close, volume, ma20, ma50, ma100, ma200, ema20, ema50, ema100, ema200, std, bollinger_high, bollinger_low, rsi, macd, macdh, macds, macd_slope, macd_sig_slope, macd_hist_slope, )
         return self.model.insert(sql, params)
-        
+
+    def get_data(self, id):
+        sql = " SELECT * FROM `data` WHERE id = %s "
+        params = (id, )
+        return self.model.select_one(sql, params)

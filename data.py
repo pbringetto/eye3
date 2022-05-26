@@ -14,6 +14,9 @@ class Data:
     def signal_keys(self):
         return ['at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_rising'], ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_dropping']
 
+    def get_data(self, id):
+        return self.signal_data.get_data(id)
+
     def get_signals(self, pair, tf):
         return self.signal_data.get_signals(pair, tf)
 

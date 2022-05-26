@@ -17,14 +17,12 @@ class Drop:
         return data
 
     def alpha(self):
-        #macd_rising_following_oversold_divergence
         data = []
         for pair in alpha["pairs"]:
             for tf in alpha["timeframes"]:
                 signals = self.data.get_recent_signals(pair['pair'], tf['seconds'])
+                signal_data = self.data.get_data(signals[0]['data_id'])
                 updated =  signals[0]['created_at'] if signals else 0
-                price =  signals[0]['price'] if signals else 0
                 buy_signals, sell_signals = self.data.split_signals(signals)
-                data.append({'pair': pair, 'timeframe': tf, 'signals': {'buy_signals': buy_signals, 'sell_signals': sell_signals}, 'updated': updated, 'price': price})
-                print(data)
+                data.append({'pair': pair, 'timeframe': tf, 'signals': {'buy_signals': buy_signals, 'sell_signals': sell_signals}, 'updated': updated, 'signal_data': signal_data})
         return data
