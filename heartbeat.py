@@ -42,8 +42,6 @@ class Heartbeat:
                 data, df = strategy.setup(df, tf['seconds'], pair['pair'])
                 buy_signals, sell_signals, update = self.signals(data, pair['pair'], tf['seconds'], df)
 
-                update = True
-
                 if update:
                     self.save_data(df, pair, tf, buy_signals, sell_signals)
                     self.post_signals(df, buy_signals, sell_signals, pair, tf)
