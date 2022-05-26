@@ -76,7 +76,7 @@ class Heartbeat:
         if signals:
             data = description + ':\r\n'
             for value in signals:
-                data = data + '* ' + value['value'] + '\r\n'
+                data = data + '  ' + value['value'] + '\r\n'
         return data
 
     def tweet(self, data):
