@@ -47,6 +47,8 @@ class Heartbeat:
                 if update:
                     self.save_data(df, pair, tf, buy_signals, sell_signals)
                     self.post_signals(df, buy_signals, sell_signals, pair, tf)
+                else:
+                    print('no update')
 
     def save_data(self, df, pair, tf, buy_signals, sell_signals):
         ma200 = 0 if np.isnan(df['ma200'].iloc[-1]) else df['ma200'].iloc[-1]
