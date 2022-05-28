@@ -147,6 +147,33 @@ class Indicator:
         df.merge(df)
         return close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df
 
+
+    def falling_wedge(self, df):
+          key = 'close'
+          b, t = df.iloc[self.bottom_idx(df, key, 5)].copy(), df.iloc[self.top_idx(df, key, 2)].copy()
+          b[f'{key}_lows_slope'] = b[key].rolling(window=5).apply(self.get_slope, raw=True)
+          t[f'{key}_highs_slope'] = t[key].rolling(window=2).apply(self.get_slope, raw=True)
+
+          pattern = False
+          if b[f'{key}_lows_slope'].iloc[-1] < 0:
+              pattern = True
+          if t[f'{key}_highs_slope'].iloc[-1] < 0:
+              pattern = True
+          if t[f'{key}_highs_slope'].iloc[-1] > b[f'{key}_lows_slope'].iloc[-1]:
+              pattern = True
+          i = 3
+          while i > 0:
+              if (t['close'].iloc[-i] - b['close'].iloc[-i]) < (t['close'].iloc[-(i-1)] - b['close'].iloc[-(i-1)]):
+                  pattern = True
+              i -= 1
+
+          data = [
+            {'key': 'falling_wedge', 'value': 'Falling wedge' if pattern else False, 'data': 0},
+          ]
+          print(pattern)
+          return data
+
+
     def divergence(self, df):
         close_bottom_slope, close_top_slope, rsi_bottom_slope, rsi_top_slope, df = self.peaks(df)
         bullish_regular = (close_bottom_slope < 0) and (rsi_bottom_slope > 0)

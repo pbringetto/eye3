@@ -26,7 +26,7 @@ class Heartbeat:
     def signals(self, data, pair, tf, df):
         signals = self.data.get_signals(pair, tf)
         buy_signals, sell_signals = self.data.split_signals(data)
-        update = self.data.structure_change(signals, data)
+        update = self.data.structure_change(signals, buy_signals + sell_signals)
         return buy_signals, sell_signals, update
 
     def go(self):
@@ -86,7 +86,7 @@ class Heartbeat:
 
         print(data)
 
-        twitter.tweet(data)
+        #twitter.tweet(data)
 
 hb = Heartbeat()
 
