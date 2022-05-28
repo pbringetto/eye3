@@ -86,7 +86,7 @@ class Heartbeat:
 
         print(data)
 
-        #twitter.tweet(data)
+        twitter.tweet(data)
 
 hb = Heartbeat()
 
