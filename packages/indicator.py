@@ -188,9 +188,9 @@ class Indicator:
     def divergence(self, df):
         close_low_slope, close_high_slope, rsi_low_slope, rsi_high_slope, df = self.rsi_close_div_peak_slopes(df)
         bullish_regular = (close_low_slope < 0) and (rsi_low_slope > 0)
-        bullish_hidden = (rsi_high_slope < 0) and (close_low_slope > 0)
         bearish_regular = (close_high_slope > 0) and (rsi_high_slope < 0)
-        bearish_hidden = (close_high_slope < 0) and (rsi_high_slope > 0)
+        bullish_hidden = (rsi_high_slope < 0) and math.isclose(close_low_slope, 0, abs_tol=1)
+        bearish_hidden = (close_high_slope < 0) and math.isclose(close_high_slope, 0, abs_tol=1)
         data = {'close_low_slope': close_low_slope, 'close_high_slope': close_high_slope, 'rsi_low_slope': rsi_low_slope, 'rsi_high_slope': rsi_high_slope}
         data = [
             {'key': 'bullish_regular', 'value': 'Bullish divergence' if bullish_regular else False},
