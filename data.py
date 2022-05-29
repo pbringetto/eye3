@@ -50,4 +50,4 @@ class Data:
         print(len(previous_signals))
         print(len(shared_signals))
 
-        return previous_signals.keys() == current_signals.keys() or len(signals) == 0
+        return previous_signals.keys() != current_signals.keys() or len(signals) == 0
