@@ -36,4 +36,7 @@ class Data:
     def structure_change(self, signals, data):
         previous_signals = u.list_to_dict(u.filter_list(signals, 'created_at', signals[0]['created_at']), 'key', 'value') if signals else []
         current_signals = u.list_to_dict(data, 'key', 'value', True)
-        return previous_signals.keys() != current_signals.keys() or len(signals) == 0
+        if previous_signals and current_signals:
+            return previous_signals.keys() != current_signals.keys()
+        else:
+            return len(signals) == 0
