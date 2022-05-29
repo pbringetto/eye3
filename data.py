@@ -41,8 +41,8 @@ class Data:
         shared_signals = u.shared_items(previous_signals, current_signals)
         #print(shared_signals)
 
-        #print((len(previous_signals) != len(shared_signals)))
-        #print(len(previous_signals))
-        #print(len(current_signals))
+        print((len(previous_signals) != len(shared_signals)))
+        print(len(previous_signals))
+        print(len(shared_signals))
 
         return (len(previous_signals) != len(shared_signals)) or len(signals) == 0
