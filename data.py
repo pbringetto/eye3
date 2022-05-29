@@ -42,11 +42,12 @@ class Data:
         print('current_signals')
         print(current_signals)
         shared_signals = u.shared_items(previous_signals, current_signals)
-        print('current_signals')
+        print('shared_signals')
         print(shared_signals)
 
-        print((len(previous_signals) != len(shared_signals)))
+        print(previous_signals.keys() == current_signals.keys())
+        #print((len(previous_signals) != len(shared_signals)))
         print(len(previous_signals))
         print(len(shared_signals))
 
-        return (len(previous_signals) != len(shared_signals)) or len(signals) == 0
+        return previous_signals.keys() == current_signals.keys() or len(signals) == 0
