@@ -18,7 +18,7 @@ class Strategy:
 
         obv_data, ohlc = self.indicator.on_balance_volume(ohlc, 5)
 
-        pattern_data = self.indicator.falling_wedge(ohlc)
+        pattern_data = self.indicator.patterns(ohlc, tf)
 
         #print(ohlc[['close', 'volume', 'bollinger_low', 'bollinger_high']].iloc[-20:])
 

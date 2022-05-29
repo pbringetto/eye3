@@ -41,8 +41,19 @@ class Heartbeat:
 
                 df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf['seconds']))
                 df.loc[len(df.index)] = [pd.to_datetime(datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00")), 0, price, price, price, price, 0]
-                data, df = strategy.setup(df, tf['seconds'], pair['pair'])
+                data, df = strategy.setup(df, tf, pair['pair'])
                 buy_signals, sell_signals, update = self.signals(data, pair['pair'], tf['seconds'], df)
+
+                print('-------------------------------------------------')
+                if buy_signals:
+                    print('Buy Signals')
+                    print(buy_signals)
+                print(' ')
+                if sell_signals:
+                    print('Sell Signals')
+                    print(sell_signals)
+
+                print('-------------------------------------------------')
 
                 if update:
                     self.save_data(df, pair, tf, buy_signals, sell_signals)
@@ -67,10 +78,10 @@ class Heartbeat:
             self.tweet(self.signal_content(data, buy_signals, sell_signals))
 
     def signal_content(self, data, buy_signals, sell_signals):
-        data = data + self.signal_sections(buy_signals, 'For the Bulls')
+        data = data + self.signal_sections(buy_signals, 'Buy Signals')
         if buy_signals and sell_signals:
             data = data + '\r\n'
-        data = data + self.signal_sections(sell_signals, 'For the Bears')
+        data = data + self.signal_sections(sell_signals, 'Sell Signals')
         return data
 
     def signal_sections(self, signals, description):

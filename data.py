@@ -12,7 +12,10 @@ class Data:
         self.signal_data = sm.SignalDataModel()
 
     def signal_keys(self):
-        return ['falling_wedge', 'at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_rising'], ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_dropping']
+        return (
+            ['falling_wedge', 'at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_rising', 'above_ma_50', 'rsi_extremely_oversold', 'bullish_macd_cross'],
+            ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_dropping', 'above_ma_50', 'rsi_extremely_overbought', 'bearish_macd_cross']
+        )
 
     def get_data(self, id):
         return self.signal_data.get_data(id)
@@ -33,13 +36,13 @@ class Data:
     def structure_change(self, signals, data):
         previous_signals = u.list_to_dict(u.filter_list(signals, 'created_at', signals[0]['created_at']), 'key', 'value') if signals else []
         current_signals = u.list_to_dict(data, 'key', 'value', True)
-        print(previous_signals)
-        print(current_signals)
+        #print(previous_signals)
+        #print(current_signals)
         shared_signals = u.shared_items(previous_signals, current_signals)
-        print(shared_signals)
+        #print(shared_signals)
 
-        print((len(previous_signals) != len(shared_signals)))
-        print(len(previous_signals))
-        print(len(current_signals))
+        #print((len(previous_signals) != len(shared_signals)))
+        #print(len(previous_signals))
+        #print(len(current_signals))
 
         return (len(previous_signals) != len(shared_signals)) or len(signals) == 0
