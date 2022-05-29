@@ -36,18 +36,4 @@ class Data:
     def structure_change(self, signals, data):
         previous_signals = u.list_to_dict(u.filter_list(signals, 'created_at', signals[0]['created_at']), 'key', 'value') if signals else []
         current_signals = u.list_to_dict(data, 'key', 'value', True)
-        print('---------------------------------------------')
-        print('previous_signals')
-        print(previous_signals)
-        print('current_signals')
-        print(current_signals)
-        shared_signals = u.shared_items(previous_signals, current_signals)
-        print('shared_signals')
-        print(shared_signals)
-
-        print(previous_signals.keys() == current_signals.keys())
-        #print((len(previous_signals) != len(shared_signals)))
-        print(len(previous_signals))
-        print(len(shared_signals))
-
         return previous_signals.keys() != current_signals.keys() or len(signals) == 0

@@ -147,13 +147,6 @@ class Indicator:
         return self.low_idx(df, key, low_window), self.high_idx(df, key, high_window)
 
     def range_less_than_prev(self, h, l, prev_h, prev_l):
-        print('------------------------')
-        print('prev high:' + str(prev_h))
-        print('prev low:' + str(prev_l))
-        print('high:' + str(h))
-        print('low:' + str(l))
-        print((h - l) < (prev_h - prev_l))
-        print('------------------------')
         return (h - l) < (prev_h - prev_l)
 
     def is_compressing(self, highs, lows, i = 3):
@@ -161,9 +154,6 @@ class Indicator:
          while i > 0:
              if self.range_less_than_prev(highs['close'].iloc[-i], lows['close'].iloc[-i], highs['close'].iloc[-(i-1)], lows['close'].iloc[-(i-1)]):
                  r = True
-             #else:
-             #    r = False
-             #    break
              i -= 1
          return r
 
