@@ -38,8 +38,14 @@ class Heartbeat:
             single_market = ftx.get_single_market(pair['pair'])
             price = single_market['price']
             for tf in alpha["timeframes"]:
+                print(tf['label'])
+
 
                 df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf['seconds']))
+
+                #print(  df.to_dict('records') )
+
+
                 df.loc[len(df.index)] = [pd.to_datetime(datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00")), 0, price, price, price, price, 0]
                 data, df = strategy.setup(df, tf, pair['pair'])
                 buy_signals, sell_signals, update = self.signals(data, pair['pair'], tf['seconds'], df)
@@ -97,7 +103,7 @@ class Heartbeat:
 
         print(data)
 
-        twitter.tweet(data)
+        #twitter.tweet(data)
 
 hb = Heartbeat()
 

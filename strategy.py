@@ -1,4 +1,5 @@
 import packages.indicator as i
+import pyangles
 
 class Strategy:
     def __init__(self):
@@ -18,8 +19,8 @@ class Strategy:
 
         obv_data, ohlc = self.indicator.on_balance_volume(ohlc, 5)
 
-        pattern_data = self.indicator.patterns(ohlc, tf)
-
+        pattern_data = pyangles.go(ohlc, 'close', [4, 4], [1, 1])
+        print(pattern_data)
         #print(ohlc[['close', 'volume', 'bollinger_low', 'bollinger_high']].iloc[-20:])
 
         data = div_data + bollinger_data + macd_data + ma_data + ema_data + pattern_data

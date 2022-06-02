@@ -46,10 +46,10 @@ class Indicator:
 
         data = {'bollinger_low': df['bollinger_low'].iloc[-1], 'bollinger_high': df['bollinger_high'].iloc[-1]}
         data = [
-            {'key': 'below_bollinger_low', 'value': 'Below bollinger Low' if df['close'].iloc[-1] < df['bollinger_low'].iloc[-1] else False},
-            {'key': 'above_bollinger_high', 'value': 'Above bollinger high' if df['close'].iloc[-1] > df['bollinger_high'].iloc[-1] else False},
-            {'key': 'at_bollinger_low', 'value': 'At Bollinger low' if math.isclose(df['close'].iloc[-1], df['bollinger_low'].iloc[-1], abs_tol=100) else False},
-            {'key': 'at_bollinger_high', 'value': 'At Bollinger high' if math.isclose(df['close'].iloc[-1], df['bollinger_high'].iloc[-1], abs_tol=100) else False},
+            {'key': 'below_bollinger_low', 'value': 'Below bollinger Low' if df['close'].iloc[-1] < (df['bollinger_low'].iloc[-1] - 10) else False},
+            {'key': 'above_bollinger_high', 'value': 'Above bollinger high' if df['close'].iloc[-1] > (df['bollinger_high'].iloc[-1] + 10) else False},
+            {'key': 'at_bollinger_low', 'value': 'At Bollinger low' if math.isclose(df['close'].iloc[-1], df['bollinger_low'].iloc[-1], abs_tol=10) else False},
+            {'key': 'at_bollinger_high', 'value': 'At Bollinger high' if math.isclose(df['close'].iloc[-1], df['bollinger_high'].iloc[-1], abs_tol=10) else False},
         ]
         return data, df
 
@@ -163,27 +163,6 @@ class Indicator:
         lows[f'{key}_lows_slope'] = lows[key].rolling(window=5).apply(self.get_slope, raw=True)
         highs[f'{key}_highs_slope'] = highs[key].rolling(window=2).apply(self.get_slope, raw=True)
         return lows, highs
-
-    def falling_wedge(self, df, key, tf):
-        df.drop(df.tail(2).index,inplace=True)
-        lows, highs = self.range_slopes(df, key, tf['slope_window'][0], tf['slope_window'][1])
-
-        r = False
-        if lows[f'{key}_lows_slope'].iloc[-1] < 0:
-            r = True
-        if highs[f'{key}_highs_slope'].iloc[-1] < 0:
-            r = True
-        if highs[f'{key}_highs_slope'].iloc[-1] > lows[f'{key}_lows_slope'].iloc[-1]:
-            r = True
-        return r
-
-    def patterns(self, df, tf):
-          key = 'close'
-          falling_wedge = self.falling_wedge(df, key, tf)
-          data = [
-            {'key': 'falling_wedge', 'value': 'Falling wedge' if falling_wedge else False},
-          ]
-          return data
 
     def divergence(self, df):
         close_low_slope, close_high_slope, rsi_low_slope, rsi_high_slope, df = self.rsi_close_div_peak_slopes(df)
