@@ -102,8 +102,8 @@ class Heartbeat:
         twitter = t.Twitter()
 
         print(data)
-
-        #twitter.tweet(data)
+        if alpha["twitter_enabled"]:
+            twitter.tweet(data)
 
 hb = Heartbeat()
 
