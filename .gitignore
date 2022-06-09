@@ -1,6 +1,7 @@
 alpha.yaml
 log.txt
 .env
+img/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
