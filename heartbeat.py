@@ -122,7 +122,7 @@ class Charts:
                     #plt.show()
 
                     if new_signal and update:
-                        file = 'img/' + str(datetime.now()) + '.png'
+                        file = os.path.join(dir, 'img/' + str(datetime.now()) + '.png')
                         plt.savefig(file)
                         self.save_data(df, pair, tf, buy_signals, sell_signals, file)
                         self.post_signals(df, buy_signals, sell_signals, pair, tf, file)
