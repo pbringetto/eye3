@@ -17,7 +17,9 @@ def is_float(v) -> bool:
     except ValueError:
         return False
 
-def show(label, value):
+def show(label, value, line = None):
+    if line and line == 'above':
+        print('-----------------------------------------------------------------------------------------------------------------')
     print(label + ': ' + str(value))
 
 def split_list(list, key, key_list_1, key_list_2):
