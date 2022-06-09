@@ -104,11 +104,11 @@ class Charts:
                         ax.annotate(patterns[0], xy=(df.iloc[-x].name, df['close'].min()), xytext=(df.iloc[-x].name, df['close'].min()))
 
 
-                    df['signal'].iloc[-1] = 'long'
+                    #df['signal'].iloc[-1] = 'long'
                     new_signal = None
                     if df['signal'].iloc[-1] in ['long', 'short']:
                         new_signal = True
-                    df['signal'].iloc[-1] = nan
+                    #df['signal'].iloc[-1] = nan
 
                     df = df.dropna(subset=['signal'])
                     for index, row in df.iterrows():
