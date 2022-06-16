@@ -43,12 +43,11 @@ class Charts:
             single_market = ftx.get_single_market(pair['pair'])
             price = single_market['price']
             for tf in alpha["timeframes"]:
-                import matplotlib.pyplot as plt
                 if tf['enabled']:
                     print(tf['label'])
                     df = pd.DataFrame(ftx.get_historical_prices(pair['pair'], tf['seconds']))
 
-                    #df.loc[len(df.index)] = [pd.to_datetime(datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00")), 0, price, price, price, price, 0]
+                    df.loc[len(df.index)] = [pd.to_datetime(datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00")), 0, price, price, price, price, 0]
 
                     df['x'] = pd.to_datetime(df['startTime'], errors='coerce', utc=True)
                     df['x'] = df['x'].dt.strftime('%Y-%m-%d')
@@ -57,9 +56,9 @@ class Charts:
 
                     buy_signals, sell_signals, update = self.signals(data, pair['pair'], tf['seconds'], df)
 
-                    #print(data)
-                    #print(lows[['close','volume','volume_slope','bollinger_high','bollinger_low','rsi','rsi_slope','macd_slope','macd_sig_slope','macd_hist_slope']][-5::])
-                    #print(highs[['close','volume','volume_slope','bollinger_high','bollinger_low','rsi','rsi_slope','macd_slope','macd_sig_slope','macd_hist_slope']][-5::])
+
+                    #print(lows[['close','volume','bollinger_high','bollinger_low','rsi','rsi_slope','macd_slope','macd_sig_slope','macd_hist_slope']][-5::])
+                    #print(highs[['close','volume','bollinger_high','bollinger_low','rsi','rsi_slope','macd_slope','macd_sig_slope','macd_hist_slope']][-5::])
 
                     #day
                     if tf['seconds'] == 86400:
@@ -105,14 +104,14 @@ class Charts:
                         ax.annotate(patterns[0], xy=(df.iloc[-x].name, df['close'].min()), xytext=(df.iloc[-x].name, df['close'].min()))
 
 
-                    #df['signal'].iloc[-1] = 'long'
+                    df['signal'].iloc[-1] = 'long'
                     new_signal = None
                     if df['signal'].iloc[-1] in ['long', 'short']:
                         new_signal = True
-                    #df['signal'].iloc[-1] = nan
+                    df['signal'].iloc[-1] = nan
 
-
-                    for index, row in df.dropna(subset=['signal']).iterrows():
+                    df = df.dropna(subset=['signal'])
+                    for index, row in df.iterrows():
                         color = 'red' if row['signal'] == 'short' else 'green'
                         #ax.annotate(row['signal'] + '   ' + str(row['macd_hist_slope']), xy=(index, row['close']), xytext=(index, row['close']), color='black',
                         ax.annotate(row['signal'], xy=(index, row['close']), xytext=(index, row['close']), color='black',
@@ -122,14 +121,13 @@ class Charts:
                     #print(new_signal)
                     #plt.show()
 
-                    if new_signal or update:
-                        file = os.path.join(dir, 'img/' + str(datetime.now()) + '.png')
+                    if new_signal and update:
+                        file = 'img/' + str(datetime.now()) + '.png'
                         plt.savefig(file)
                         self.save_data(df, pair, tf, buy_signals, sell_signals, file)
                         self.post_signals(df, buy_signals, sell_signals, pair, tf, file)
                     else:
                         print('no update')
-
 
     def save_data(self, df, pair, tf, buy_signals, sell_signals, chart_image):
         ma200 = 0 if np.isnan(df['ma200'].iloc[-1]) else df['ma200'].iloc[-1]
@@ -141,10 +139,7 @@ class Charts:
     def post_signals(self, df, buy_signals, sell_signals, pair, tf, file):
         if buy_signals or sell_signals:
             utc_datetime = datetime.utcnow()
-            data = ''
-            for h in pair['hash_tags']:
-                data = data + '#' + h+ ' '
-            data = data + '\r\n'
+            data = '#' + pair['label'] + '\r\n'
             data = data + '$' + str(df['close'].iloc[-1]) + '\r\n'
             data = data + str(utc_datetime.strftime("%Y-%m-%d %H:%M:%S")) + '\r\n'
             data = data + 'Timeframe: ' + tf['label'] + '\r\n\r\n'
@@ -162,7 +157,7 @@ class Charts:
         if signals:
             data = description + ':\r\n'
             for value in signals:
-                data = data + '  ' + value['value'] + '\r\n'      
+                data = data + '  ' + value['value'] + '\r\n'
         return data
 
     def tweet(self, data, file):
