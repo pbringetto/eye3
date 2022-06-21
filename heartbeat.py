@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import StrMethodFormatter
 import matplotlib.lines as lines
 from matplotlib import rcParams
+plt.style.use('dark_background')
 rcParams.update({'figure.autolayout': True})
 import math
 
@@ -66,27 +67,15 @@ class Charts:
                         df.loc[df.close < (df.ema20 - (df['std'] * tf['std_multiplier'])), 'signal'] = 'long'
                         df.loc[(df.close > (df.ema20 + (df['std'] * tf['std_multiplier']))) & df.macd_slope.gt(tf['macd_slope_gt']), 'signal'] = 'short'
 
-                    if tf['seconds'] == 14400:
-                        df.loc[(df.close < (df.ema100 - (df['std'] * 3.4))) & df.macd_slope.gt(tf['macd_slope_gt']) & df.macd_slope.lt(tf['macd_slope_lt']) & df.rsi_slope.lt(tf['rsi_slope_lt']) & df.macd_hist_slope.lt(tf['macd_hist_slope_lt']) & df.macd_hist_slope.gt(tf['macd_hist_slope_gt']), 'signal'] = 'long'
-                        df['signal'].loc[df.signal.eq('long') & df.signal.shift(-1).eq('long')] = nan
-                        df.loc[df.rsi.gt(tf['short_rsi_gt']), 'signal'] = 'short'
-
-                    if tf['seconds'] == 3600:
-                        df.loc[ (df.close < df.bollinger_low) & df.rsi_slope.gt(tf[ 'long_rsi_slope_gt' ]) & df.macd_hist_slope.lt(tf[ 'long_macd_hist_slope_lt' ]) & df.macd_hist_slope.gt(tf[ 'long_macd_hist_slope_gt' ]), 'signal' ] = 'long'
-                        df[ 'signal' ].loc[ df.signal.eq('long') & df.signal.shift(-1).eq('long') ] = nan
-                        df.loc[ df.rsi.gt(tf[ 'short_rsi_gt' ]) & df.rsi_slope.lt(tf['short_rsi_lt' ]) & df.macd_slope.gt(tf['short_macd_slope_gt' ]) & df.macd_slope.lt(tf['short_macd_slope_lt' ]) & df.macd_hist_slope.gt(tf['short_macd_hist_slope_gt' ]), 'signal' ] = 'short'
-                        df[ 'signal' ].loc[ df.signal.eq('short') & df.signal.shift(-1).eq('short') ] = nan
-
                     ax = None
                     ax = df.set_index('x').plot(kind='line', use_index=True, y='close', color="blue")
 
-                    ax.set_title(pair['label'] + ' - ' + tf['label'], color='black')
-                    ax.set_facecolor("gray")
+                    ax.set_title(pair['label'] + ' - ' + tf['label'])
+                    #ax.set_facecolor("gray")
                     x_axis = ax.axes.get_xaxis()
                     x_axis.label.set_visible(False)
                     ax.tick_params(axis='x', labelrotation = -90)
-                    ax.tick_params(labelcolor='black')
-
+                    #ax.tick_params(labelcolor='black')
 
                     line = lines.Line2D([ highs.iloc[tf['peak_depth']].name, highs.iloc[-1].name ], [  highs['close'].iloc[tf['peak_depth']], highs['close'].iloc[-1]  ],
                                         lw=2, color='tab:orange', axes=ax)
@@ -104,7 +93,6 @@ class Charts:
                     if patterns:
                         ax.annotate(patterns[0], xy=(df.iloc[-x].name, df['close'].min()), xytext=(df.iloc[-x].name, df['close'].min()))
 
-
                     #df['signal'].iloc[-1] = 'long'
                     new_signal = None
                     if df['signal'].iloc[-1] in ['long', 'short']:
@@ -115,9 +103,7 @@ class Charts:
                     for index, row in df.dropna(subset=['signal']).iterrows():
                         color = 'red' if row['signal'] == 'short' else 'green'
                         #ax.annotate(row['signal'] + '   ' + str(row['macd_hist_slope']), xy=(index, row['close']), xytext=(index, row['close']), color='black',
-                        ax.annotate(row['signal'], xy=(index, row['close']), xytext=(index, row['close']), color='black',
-                            arrowprops=dict(facecolor='black', shrink=0.05),
-                        )
+                        ax.annotate(row['signal'], xy=(index, row['close']), xytext=(index, row['close']), arrowprops=dict(shrink=0.05))
 
                     #print(new_signal)
                     #plt.show()
