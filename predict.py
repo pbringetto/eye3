@@ -506,5 +506,5 @@ class Predict:
         data = data + str(utc_datetime.strftime("%Y-%m-%d %H:%M:%S")) + '\r\n'
         data = data + 'Timeframe: ' + '1 Day' + '\r\n\r\n'
         print(data)
-        #twitter.tweet(data, files)
+        twitter.tweet(data, files)
 p = Predict()
