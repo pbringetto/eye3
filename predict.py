@@ -428,6 +428,8 @@ class Predict:
     def go(self):
         prediction_column = 'close'
         df = self.data()
+        #data, df = ta_signals.go(df, 'close', 2)
+        #df = df.filter(items=['date', 'open', 'high', 'low', 'close', 'ema100'])
 
         mean_accuracy = 0
         '''
@@ -445,7 +447,7 @@ class Predict:
         print(accuracy)
         print(mean_accuracy)
 
-        Next5DaysPrice = pd.DataFrame(Next5DaysPrice[0].tolist(), columns=['close'])
+        Next5DaysPrice = pd.DataFrame(Next5DaysPrice[0].tolist(), columns=['prediction'])
 
         utc_datetime = datetime.now(timezone.utc)
 
@@ -462,8 +464,9 @@ class Predict:
         plt.xlabel('Date',fontsize=18)
         plt.ylabel('Close Price USD($)',fontsize=18)
         plt.plot(df['date'][-55:], df['close'][-55:])
-        plt.plot(Next5DaysPrice['date'], Next5DaysPrice['close'])
+        plt.plot(Next5DaysPrice['date'], Next5DaysPrice['prediction'])
         plt.xticks(rotation="vertical")
+        plt.legend(['close', 'prediction'], loc="upper left")
         file = os.path.join(dir, 'img/predict-' + str(datetime.now()) + '.png')
         plt.savefig(file)
         files.append(file)
@@ -472,7 +475,8 @@ class Predict:
         plt.title('5 Day close price prediction')
         plt.xlabel('Date',fontsize=18)
         plt.ylabel('Close Price USD($)',fontsize=18)  
-        plt.plot(Next5DaysPrice['date'], Next5DaysPrice['close'])
+        plt.plot(Next5DaysPrice['date'], Next5DaysPrice['prediction'])
+        plt.legend(['close'], loc="upper left")
         file = os.path.join(dir, 'img/5DayPredict-' + str(datetime.now()) + '.png')
         plt.savefig(file)
         files.append(file)
@@ -482,6 +486,7 @@ class Predict:
         plt.xlabel('Date',fontsize=18)
         plt.ylabel('Prediction Accuracy',fontsize=18)  
         plt.plot(Next5DaysPrice['date'], Next5DaysPrice['accuracy'])
+        plt.legend(['accuracy'], loc="upper left")
         file = os.path.join(dir, 'img/5DayPredictAccuracy-' + str(datetime.now()) + '.png')
         plt.savefig(file)
         files.append(file)
@@ -494,5 +499,6 @@ class Predict:
         data = data + str(utc_datetime.strftime("%Y-%m-%d %H:%M:%S")) + '\r\n'
         data = data + 'Timeframe: ' + '1 Day' + '\r\n\r\n'
         print(data)
-        twitter.tweet(data, files)
+        if alpha["twitter_enabled"]:
+            twitter.tweet(data, files)
 p = Predict()
