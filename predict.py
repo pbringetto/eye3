@@ -14,25 +14,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('dark_background')
-from datetime import datetime, timedelta
-'''
-from pandas_datareader import data
-
-
-import datetime as dt
-import urllib.request, json
-import os
-
-import tensorflow as tf 
-from sklearn.preprocessing import MinMaxScaler
-'''
+from datetime import datetime, timedelta, timezone
 
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.max_columns', 1000)
 pd.set_option('display.width', 1000)
 np.set_printoptions(threshold=sys.maxsize)
-
-
 
 class Predict:
 
@@ -459,8 +446,10 @@ class Predict:
         print(mean_accuracy)
 
         Next5DaysPrice = pd.DataFrame(Next5DaysPrice[0].tolist(), columns=['close'])
-        base = datetime.today() #+ timedelta(days=1)
-        date_list = [base + timedelta(days=x) for x in range(5)]
+
+        utc_datetime = datetime.now(timezone.utc)
+
+        date_list = [utc_datetime + timedelta(days=x) for x in range(5)]
         date_list = [o.strftime('%Y-%m-%d') for o in date_list]
 
         Next5DaysPrice['date'] = date_list
@@ -498,7 +487,6 @@ class Predict:
         files.append(file)
 
         twitter = t.Twitter()
-        utc_datetime = datetime.utcnow()
         data = ''
         for h in ['BTCUSD','BTC','Bitcoin','DeepLearning','NeuralNetworks']:
             data = data + '#' + h+ ' '

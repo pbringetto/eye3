@@ -16,7 +16,7 @@ pd.set_option('display.width', 1000)
 import models.signal_model as sm
 signal_data = sm.SignalDataModel()
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from numpy import nan
 import matplotlib.pyplot as plt
 from matplotlib.ticker import StrMethodFormatter
@@ -108,13 +108,11 @@ class Charts:
                     #print(new_signal)
                     #plt.show()
 
-                    if update:
-                        file = os.path.join(dir, 'img/' + str(datetime.now()) + '.png')
-                        plt.savefig(file)
-                        self.save_data(df, pair, tf, buy_signals, sell_signals, file)
-                        self.post_signals(df, buy_signals, sell_signals, pair, tf, file)
-                    else:
-                        print('no update')
+                    file = os.path.join(dir, 'img/' + str(datetime.now()) + '.png')
+                    plt.savefig(file)
+                    self.save_data(df, pair, tf, buy_signals, sell_signals, file)
+                    self.post_signals(df, buy_signals, sell_signals, pair, tf, file)
+                 
 
 
     def save_data(self, df, pair, tf, buy_signals, sell_signals, chart_image):
@@ -126,7 +124,7 @@ class Charts:
 
     def post_signals(self, df, buy_signals, sell_signals, pair, tf, file):
         if buy_signals or sell_signals:
-            utc_datetime = datetime.utcnow()
+            utc_datetime = datetime.now(timezone.utc)
             data = ''
             for h in pair['hash_tags']:
                 data = data + '#' + h+ ' '
@@ -156,7 +154,7 @@ class Charts:
 
         print(data)
         if alpha["twitter_enabled"]:
-            twitter.tweet(data, file)
+            twitter.tweet(data, [file])
 
 c = Charts()
 

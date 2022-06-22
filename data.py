@@ -13,8 +13,8 @@ class Data:
 
     def signal_keys(self):
         return (
-            ['descending_wedge', 'at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_rising', 'below_ma_50', 'rsi_extremely_oversold', 'bullish_macd_cross', 'volume_rising_fast'],
-            ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_dropping', 'above_ma_50', 'rsi_extremely_overbought', 'bearish_macd_cross', 'volume_dropping_fast']
+            ['descending_wedge', 'at_bollinger_low', 'below_bollinger_low', 'rsi_oversold', 'bullish_regular', 'bullish_hidden', 'macd_rising', 'below_ma_50', 'rsi_extremely_oversold', 'bullish_macd_cross'],
+            ['above_bollinger_high', 'at_bollinger_high', 'rsi_overbought', 'bearish_regular', 'bearish_regular', 'macd_dropping', 'above_ma_50', 'rsi_extremely_overbought', 'bearish_macd_cross']
         )
 
     def get_data(self, id):
