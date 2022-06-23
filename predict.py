@@ -272,8 +272,8 @@ class Predict:
 
 
         # Making predictions on test data
-        Last10DaysPrices=np.array([1376.2, 1371.75,1387.15,1370.5 ,1344.95, 
-                        1312.05, 1316.65, 1339.45, 1339.7 ,1340.85])
+        #Last10DaysPrices=np.array([1376.2, 1371.75,1387.15,1370.5 ,1344.95, 
+        #                1312.05, 1316.65, 1339.45, 1339.7 ,1340.85])
         
         Last10DaysPrices = np.array(df[prediction_column][-10:].tolist())
 
@@ -493,7 +493,7 @@ class Predict:
 
         twitter = t.Twitter()
         data = ''
-        for h in ['BTCUSD','BTC','Bitcoin','DeepLearning','NeuralNetworks']:
+        for h in ['BTCUSD','BTC','Bitcoin','DeepLearning', 'LTSM', 'NeuralNetworks']:
             data = data + '#' + h+ ' '
         data = data + '\r\n'
         data = data + str(utc_datetime.strftime("%Y-%m-%d %H:%M:%S")) + '\r\n'

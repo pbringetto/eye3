@@ -62,10 +62,23 @@ class Charts:
                     #print(lows[['close','volume','volume_slope','bollinger_high','bollinger_low','rsi','rsi_slope','macd_slope','macd_sig_slope','macd_hist_slope']][-5::])
                     #print(highs[['close','volume','volume_slope','bollinger_high','bollinger_low','rsi','rsi_slope','macd_slope','macd_sig_slope','macd_hist_slope']][-5::])
 
+                    print(df.head(5))
+
                     #day
                     if tf['seconds'] == 86400:
                         df.loc[df.close < (df.ema20 - (df['std'] * tf['std_multiplier'])), 'signal'] = 'long'
                         df.loc[(df.close > (df.ema20 + (df['std'] * tf['std_multiplier']))) & df.macd_slope.gt(tf['macd_slope_gt']), 'signal'] = 'short'
+
+                    #hour
+                    if tf['seconds'] == 3600:
+                        
+                        df = df[-300:]
+                        df.loc[df.close > df.ema8, 'signal'] = 'long'
+                        df.loc[df.close < df.ema8, 'signal'] = 'short'
+                        print(df[-300:][['close','ema8','signal']])
+                        
+
+
 
                     ax = None
                     ax = df.set_index('x').plot(kind='line', use_index=True, y='close', color="blue")
