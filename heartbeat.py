@@ -68,7 +68,7 @@ class Charts:
                     if tf['seconds'] == 86400:
                         df.loc[df.close < (df.ema20 - (df['std'] * tf['std_multiplier'])), 'signal'] = 'long'
                         df.loc[(df.close > (df.ema20 + (df['std'] * tf['std_multiplier']))) & df.macd_slope.gt(tf['macd_slope_gt']), 'signal'] = 'short'
-
+                    '''
                     #hour
                     if tf['seconds'] == 3600:
                         
@@ -76,7 +76,7 @@ class Charts:
                         df.loc[df.close > df.ema8, 'signal'] = 'long'
                         df.loc[df.close < df.ema8, 'signal'] = 'short'
                         print(df[-300:][['close','ema8','signal']])
-                        
+                    ''' 
 
 
 
